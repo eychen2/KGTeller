@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
 const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>{
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -9,15 +9,12 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const addNode = (e) => {
         e.preventDefault();
-        console.log(node)
-        console.log(colors[elements.length])
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
             setElements([...elements, {id: node, data: {label: node},position:{x:1250,y:200}, style:{color: colors[elements.length]}}]);
             setcolormap(colormap.set(node,colors[elements.length]))
         }
-        console.log(elements);
         setnode("");
     };
     const addEdge = (e) =>{
@@ -26,9 +23,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         console.log(target)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
-            setEdges([...edges,{id:(edges.length+1).toString(), source:source, target:target, label:label, markerEnd: {
-                type: "arrowclosed"
-              }}])//style:{stroke: colors[elements.length]}}])
+            setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source, target:target, label:label, markerEnd: {
+                type: "arrowclosed", color: 'black'
+              },style: { stroke: 'black' }}])//style:{stroke: colors[elements.length]}}])
         }
         setsource('');
         settarget('');
@@ -62,7 +59,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
             index++;
         }
         realcolors.pop();
-        console.log(realcolors);
         setsentence(temp);
         settemp('');
         setcolors(realcolors);

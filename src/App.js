@@ -7,12 +7,15 @@ import ReactFlow, {
 } from 'react-flow-renderer';
 import Form from './Form'
 import React, {useState} from 'react'
+import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
+const edgeTypes = {
+	smart: SmartBezierEdge
+}
 const getRandomColor = () => {
   const colors = ['red', 'orange', 'green', 'blue']
   return colors[Math.floor(Math.random() * colors.length)];
 }
 const getColor = (colors, index) => {
-  console.log(colors);
   return colors[index];
 }
 const ColorPara = (props, colors) => {
@@ -21,7 +24,7 @@ const ColorPara = (props, colors) => {
     <p>
       {props.children.split(' ').map(text => {
         return (
-          <div style={{ color: getColor(colors, i++), display: 'inline', }}>
+          <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
             {text} &nbsp;
           </div>
         )
@@ -40,6 +43,7 @@ const OverviewFlow = () => {
       <ColorPara colors={colors}>{sentence}</ColorPara>
       <div style={{height: 800}}>
       <ReactFlow
+      edgeTypes={edgeTypes}
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}
