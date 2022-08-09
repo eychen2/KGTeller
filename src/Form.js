@@ -38,11 +38,28 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         setElements(elements.sort((a, b) => {
             return a.id.length - b.id.length;
         }));
-        console.log(elements);
         for(const x of elements)
         {
 
             var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
             while(indexOccurence >= 0) 
             {
                 textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
@@ -80,8 +97,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
                 <input type="text" value={temp} placeholder="Sentence" onChange={(e)=> settemp(e.target.value)}></input>
             <button onClick={addSentence} className="submitButton" type="submit" > Add Sentence</button>
             </div>
-            
-
         </form>
     )
 }
