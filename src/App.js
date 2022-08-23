@@ -6,7 +6,7 @@ import ReactFlow, {
   useEdgesState,
 } from 'react-flow-renderer';
 import Form from './Form'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
 const edgeTypes = {
 	smart: SmartBezierEdge
