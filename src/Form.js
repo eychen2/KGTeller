@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>{
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
     const [label, setlabel] = useState('');
-    const [temp, settemp] = useState('');
+    const [sentence_holder, setsentence_holder] = useState('');
+    const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const addNode = (e) => {
@@ -12,25 +13,39 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
-            setElements([...elements, {id: node, data: {label: node},position:{x:1250,y:200}, style:{color: colors[elements.length]}}]);
+            setElements([...elements, {id: node, data: {label: node},position:{x:1250,y:200}, style:{color: colors[elements.length]}}].sort((a, b) => {
+                return a.id.length - b.id.length;
+            }));
             setcolormap(colormap.set(node,colors[elements.length]))
         }
         setnode("");
     };
     const addEdge = (e) =>{
         e.preventDefault();
-        var index = elements.findIndex(x=>(x.source===source && x.target===target))
-        console.log(target)
+        var index = edges.findIndex(x=>(x.source===source && x.target===target))
+        console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
             setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source, target:target, label:label, markerEnd: {
                 type: "arrowclosed", color: 'black'
               },style: { stroke: 'black' }}])//style:{stroke: colors[elements.length]}}])
         }
+        if(index!==-1&&label!=='')
+        {
+            console.log('reached')
+            const updateedge=edges
+            updateedge[index].label=updateedge[index].label+", "+label
+            setEdges(updateedge)
+            console.log(edges)
+        }
         setsource('');
         settarget('');
         setlabel('');
     };
+    useEffect(()=> {
+        console.log('reached')
+        setEdges(edges)
+    },[edges])
     const addSentence = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
@@ -38,9 +53,14 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         setElements(elements.sort((a, b) => {
             return a.id.length - b.id.length;
         }));
+        setsentence(sentence_holder);
+        settemp(sentence_holder)
+    };
+    useEffect(()=> {
+        var temp2 = (" "+temp+" ").toLowerCase();
+        var textcolors= Array(temp2.length).fill('black');
         for(const x of elements)
         {
-
             var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
             while(indexOccurence >= 0) 
             {
@@ -76,10 +96,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
             index++;
         }
         realcolors.pop();
-        setsentence(temp);
-        settemp('');
         setcolors(realcolors);
-    };
+        setsentence_holder('');
+        },[elements,temp]);
     return(
         <form>
             <div>
@@ -94,7 +113,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
             </div>
 
             <div>
-                <input type="text" value={temp} placeholder="Sentence" onChange={(e)=> settemp(e.target.value)}></input>
+                <input type="text" value={sentence_holder} placeholder="Sentence" onChange={(e)=> setsentence_holder(e.target.value)}></input>
             <button onClick={addSentence} className="submitButton" type="submit" > Add Sentence</button>
             </div>
         </form>
