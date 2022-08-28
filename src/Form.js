@@ -7,13 +7,24 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
     const [sentence_holder, setsentence_holder] = useState('');
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
+    const [edge,setEdge] = useState({source:'', target:'', label:''})
+    const [files, setFiles] = useState("");
+    const [fileindex,setfileindex]= useState(0);
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
+    const Reset = () => {
+        setElements([]);
+        setEdges([]);
+        settemp("");
+        setsentence_holder("");
+        setcolormap(colormap.clear());
+        setcolors([]);
+      }
     const addNode = (e) => {
         e.preventDefault();
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
-            setElements([...elements, {id: node, data: {label: node},position:{x:1250,y:200}, style:{color: colors[elements.length]}}].sort((a, b) => {
+            setElements([...elements, {id: node, data: {label: node},position:{x:0,y:700}, style:{color: colors[elements.length]}}].sort((a, b) => {
                 return a.id.length - b.id.length;
             }));
             setcolormap(colormap.set(node,colors[elements.length]))
@@ -22,6 +33,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
     };
     const addEdge = (e) =>{
         e.preventDefault();
+        setEdge({source: {source}, target: {target},label:{label} })
+    };
+    useEffect(()=> {
         var index = edges.findIndex(x=>(x.source===source && x.target===target))
         console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
@@ -41,11 +55,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         setsource('');
         settarget('');
         setlabel('');
-    };
-    useEffect(()=> {
-        console.log('reached')
-        setEdges(edges)
-    },[edges])
+    },[edge])
     const addSentence = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
@@ -99,6 +109,61 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         setcolors(realcolors);
         setsentence_holder('');
         },[elements,temp]);
+    const handleFile = e => {
+        const fileReader = new FileReader();
+        fileReader.readAsText(e.target.files[0], "UTF-8");
+        fileReader.onload = e => {
+            Reset();
+            setFiles(JSON.parse(e.target.result));
+        };
+    }
+    useEffect(()=> { 
+        console.log(fileindex)
+        const current = files[fileindex]
+        console.log(current)
+        if(current)
+        {
+            var tempnodes=[];
+            const length = current.nodes.length
+            let tempcolor= new Map()
+            let y=4;
+            for(var i=0; i<length;++i)
+            {
+                tempnodes.push({id: current.nodes[i], data: {label: current.nodes[i]},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}})
+                if(i%4===3)
+                    y-=1;
+                tempcolor.set(current.nodes[i],colors[tempnodes.length-1])
+            }
+            var tempedges=[];
+            const elength = current.edges.length;
+            for(var i=0; i<elength;++i)
+            {
+                tempedges.push({id: (i).toString(), type: 'smart', source:current.edges[i].source, 
+                target:current.edges[i].target, label:current.edges[i].label, markerEnd: {
+                    type: "arrowclosed", color: 'black'
+                  },style: { stroke: 'black' }})
+            }
+            console.log(current.sentence)
+            settemp(current.sentence)
+            setElements(tempnodes.sort((a, b) => {
+                return a.id.length - b.id.length;
+            }))
+            setEdges(tempedges)
+            setcolormap(tempcolor)
+            setsentence(current.sentence)
+        }
+    },[files,fileindex]);
+    const goPrevious= (e) =>{
+        e.preventDefault()
+        if(fileindex>0)
+            setfileindex(fileindex-1);
+
+    };
+    const goNext= (e) =>{
+        e.preventDefault()
+        if(fileindex<files.length-1)
+            setfileindex(fileindex+1);
+    };
     return(
         <form>
             <div>
@@ -115,6 +180,12 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
             <div>
                 <input type="text" value={sentence_holder} placeholder="Sentence" onChange={(e)=> setsentence_holder(e.target.value)}></input>
             <button onClick={addSentence} className="submitButton" type="submit" > Add Sentence</button>
+            </div>
+            <div>
+            <input type="file" onChange={handleFile} />
+            <button onClick={goPrevious} className="submitButton" type="submit" >Previous</button>
+            <button onClick={goNext} className="submitButton" type="submit" >Next</button>
+
             </div>
         </form>
     )

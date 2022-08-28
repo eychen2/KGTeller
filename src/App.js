@@ -37,6 +37,7 @@ const OverviewFlow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [sentence, setsentence] = useState('');
   const [colors, setcolors] = useState([]);
+  
   return (
     <div className = "app">
       <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors}/>
