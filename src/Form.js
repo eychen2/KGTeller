@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>{
+const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson}) =>{
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
@@ -24,10 +24,10 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
-            setElements([...elements, {id: node, data: {label: node},position:{x:0,y:700}, style:{color: colors[elements.length]}}].sort((a, b) => {
+            setElements([...elements, {id: node.toLowerCase(), data: {label: node},position:{x:0,y:700}, style:{color: colors[elements.length]}}].sort((a, b) => {
                 return a.id.length - b.id.length;
             }));
-            setcolormap(colormap.set(node,colors[elements.length]))
+            setcolormap(colormap.set(node.toLowerCase(),colors[elements.length]))
         }
         setnode("");
     };
@@ -36,7 +36,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         setEdge({source: {source}, target: {target},label:{label} })
     };
     useEffect(()=> {
-        var index = edges.findIndex(x=>(x.source===source && x.target===target))
+        var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
         console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
@@ -56,7 +56,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
         settarget('');
         setlabel('');
     },[edge])
-    const addSentence = (e) =>{
+    const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
@@ -129,28 +129,29 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
             let y=4;
             for(var i=0; i<length;++i)
             {
-                tempnodes.push({id: current.nodes[i], data: {label: current.nodes[i]},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}})
+                tempnodes.push({id: current.nodes[i].toLowerCase(), data: {label: current.nodes[i]},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}})
                 if(i%4===3)
                     y-=1;
-                tempcolor.set(current.nodes[i],colors[tempnodes.length-1])
+                tempcolor.set(current.nodes[i].toLowerCase(),colors[tempnodes.length-1])
             }
             var tempedges=[];
             const elength = current.edges.length;
             for(var i=0; i<elength;++i)
             {
-                tempedges.push({id: (i).toString(), type: 'smart', source:current.edges[i].source, 
-                target:current.edges[i].target, label:current.edges[i].label, markerEnd: {
+                tempedges.push({id: (i).toString(), type: 'smart', source:current.edges[i].source.toLowerCase(), 
+                target:current.edges[i].target.toLowerCase(), label:current.edges[i].label, markerEnd: {
                     type: "arrowclosed", color: 'black'
                   },style: { stroke: 'black' }})
             }
-            console.log(current.sentence)
-            settemp(current.sentence)
+            console.log(current.text)
+            settemp(current.text)
             setElements(tempnodes.sort((a, b) => {
                 return a.id.length - b.id.length;
             }))
             setEdges(tempedges)
             setcolormap(tempcolor)
-            setsentence(current.sentence)
+            setsentence(current.text)
+            setjson({nodes:JSON.stringify({nodes:current.nodes}),edges:JSON.stringify({edges:current.edges}),text:JSON.stringify({text:current.text})})
         }
     },[files,fileindex]);
     const goPrevious= (e) =>{
@@ -179,7 +180,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors}) =>
 
             <div>
                 <input type="text" value={sentence_holder} placeholder="Sentence" onChange={(e)=> setsentence_holder(e.target.value)}></input>
-            <button onClick={addSentence} className="submitButton" type="submit" > Add Sentence</button>
+            <button onClick={addText} className="submitButton" type="submit" > Add Text</button>
             </div>
             <div>
             <input type="file" onChange={handleFile} />

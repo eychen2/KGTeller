@@ -37,11 +37,15 @@ const OverviewFlow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [sentence, setsentence] = useState('');
   const [colors, setcolors] = useState([]);
+  const [json, setjson] = useState({nodes:'',edges:'', text:''});
   
   return (
     <div className = "app">
-      <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors}/>
+      <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson}/>
       <ColorPara colors={colors}>{sentence}</ColorPara>
+      <p>{json.nodes}</p>
+      <p>{json.edges}</p>
+      <p>{json.text}</p>
       <div style={{height: 800}}>
       <ReactFlow
       edgeTypes={edgeTypes}
