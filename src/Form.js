@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import download from 'downloadjs';
 const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson}) =>{
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -165,6 +166,18 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         if(fileindex<files.length-1)
             setfileindex(fileindex+1);
     };
+    const saveFile = (e) =>{
+        e.preventDefault();
+        var tempnodes=[];
+        var tempedges=[];
+        for(var i=0; i<elements.length;++i)
+            tempnodes.push(elements[i].id);
+        for(var i=0; i<edges.length;++i)
+            tempedges.push({source: edges[i].source, target: edges[i].target, label: edges[i].label})
+        var tempjson = {nodes: tempnodes, edges: tempedges, text: temp}
+        var filestring= JSON.stringify(tempjson)
+        download(filestring,"data.json","text/plain");
+    }
     return(
         <form>
             <div>
@@ -186,6 +199,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             <input type="file" onChange={handleFile} />
             <button onClick={goPrevious} className="submitButton" type="submit" >Previous</button>
             <button onClick={goNext} className="submitButton" type="submit" >Next</button>
+            </div>
+            <div>
+            <button onClick={saveFile} className="submitButton" type="submit" >Save File</button>
 
             </div>
         </form>

@@ -43,6 +43,7 @@ const OverviewFlow = () => {
     <div className = "app">
       <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson}/>
       <ColorPara colors={colors}>{sentence}</ColorPara>
+      <h3>JSON text</h3>
       <p>{json.nodes}</p>
       <p>{json.edges}</p>
       <p>{json.text}</p>
