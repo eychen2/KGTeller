@@ -192,13 +192,13 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             </div>
 
             <div>
-                <input type="text" value={sentence_holder} placeholder="Sentence" onChange={(e)=> setsentence_holder(e.target.value)}></input>
+                <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)}></input>
             <button onClick={addText} className="submitButton" type="submit" > Add Text</button>
             </div>
             <div>
             <input type="file" onChange={handleFile} />
-            <button onClick={goPrevious} className="submitButton" type="submit" >Previous</button>
-            <button onClick={goNext} className="submitButton" type="submit" >Next</button>
+            {fileindex>0&&<button onClick={goPrevious} className="submitButton" type="submit" >Previous</button>}
+            {fileindex<files.length-1&&<button onClick={goNext} className="submitButton" type="submit" >Next</button>}
             </div>
             <div>
             <button onClick={saveFile} className="submitButton" type="submit" >Save File</button>
