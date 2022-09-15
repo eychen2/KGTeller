@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import download from 'downloadjs';
-const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson}) =>{
+const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles}) =>{
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
@@ -9,8 +9,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
-    const [files, setFiles] = useState("");
-    const [fileindex,setfileindex]= useState(0);
+    const [filereader, setfilereader] = useState(new FileReader());
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const Reset = () => {
         setElements([]);
@@ -19,6 +18,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsentence_holder("");
         setcolormap(colormap.clear());
         setcolors([]);
+        setFiles("");
+        setfileindex(0);
       }
     const addNode = (e) => {
         e.preventDefault();
@@ -56,7 +57,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsource('');
         settarget('');
         setlabel('');
-    },[edge])
+        },[edge])
     const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
@@ -66,6 +67,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         }));
         setsentence(sentence_holder);
         settemp(sentence_holder)
+        
     };
     useEffect(()=> {
         var temp2 = (" "+temp+" ").toLowerCase();
@@ -109,15 +111,17 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         realcolors.pop();
         setcolors(realcolors);
         setsentence_holder('');
+        
         },[elements,temp]);
     const handleFile = e => {
-        const fileReader = new FileReader();
-        fileReader.readAsText(e.target.files[0], "UTF-8");
-        fileReader.onload = e => {
+        filereader.readAsText(e.target.files[0], "UTF-8");
+    }
+    useEffect(()=> {
+        filereader.onload = e => {
             Reset();
             setFiles(JSON.parse(e.target.result));
-        };
-    }
+        }; 
+    },[filereader]);
     useEffect(()=> { 
         console.log(fileindex)
         const current = files[fileindex]
@@ -155,17 +159,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             setjson({nodes:JSON.stringify({nodes:current.nodes}),edges:JSON.stringify({edges:current.edges}),text:JSON.stringify({text:current.text})})
         }
     },[files,fileindex]);
-    const goPrevious= (e) =>{
-        e.preventDefault()
-        if(fileindex>0)
-            setfileindex(fileindex-1);
-
-    };
-    const goNext= (e) =>{
-        e.preventDefault()
-        if(fileindex<files.length-1)
-            setfileindex(fileindex+1);
-    };
     const saveFile = (e) =>{
         e.preventDefault();
         var tempnodes=[];
@@ -176,7 +169,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             tempedges.push({source: edges[i].source, target: edges[i].target, label: edges[i].label})
         var tempjson = {nodes: tempnodes, edges: tempedges, text: temp}
         var filestring= JSON.stringify(tempjson)
-        download(filestring,"data.json","text/plain");
+        download('['+filestring+']',"data.json","text/plain");
     }
     return(
         <form>
@@ -197,12 +190,13 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             </div>
             <div>
             <input type="file" onChange={handleFile} />
-            {fileindex>0&&<button onClick={goPrevious} className="submitButton" type="submit" >Previous</button>}
-            {fileindex<files.length-1&&<button onClick={goNext} className="submitButton" type="submit" >Next</button>}
             </div>
             <div>
             <button onClick={saveFile} className="submitButton" type="submit" >Save File</button>
 
+            </div>
+            <div>
+            <button onClick={Reset} className="submitButton" type="submit" >Clear all</button>
             </div>
         </form>
     )

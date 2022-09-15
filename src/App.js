@@ -8,13 +8,11 @@ import ReactFlow, {
 import Form from './Form'
 import React, {useEffect, useState} from 'react'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
+import Changefileindex from './Changefileindex';
 const edgeTypes = {
 	smart: SmartBezierEdge
 }
-const getRandomColor = () => {
-  const colors = ['red', 'orange', 'green', 'blue']
-  return colors[Math.floor(Math.random() * colors.length)];
-}
+
 const getColor = (colors, index) => {
   return colors[index];
 }
@@ -33,15 +31,17 @@ const ColorPara = (props, colors) => {
   )
 }
 const OverviewFlow = () => {
+  const [fileindex,setfileindex]= useState(0);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [sentence, setsentence] = useState('');
   const [colors, setcolors] = useState([]);
   const [json, setjson] = useState({nodes:'',edges:'', text:''});
+  const [files, setFiles] = useState("");
   
   return (
     <div className = "app">
-      <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson}/>
+      <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
       <ColorPara colors={colors}>{sentence}</ColorPara>
       <h3>JSON text</h3>
       <p>{json.nodes}</p>
@@ -76,7 +76,9 @@ const OverviewFlow = () => {
       <Background color="#aaa" gap={16} />
     </ReactFlow>
       </div>
+      <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
     </div>
+
     
     
   );
