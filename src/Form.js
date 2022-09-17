@@ -185,8 +185,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             </div>
 
             <div>
-                <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)}></input>
-            <button onClick={addText} className="submitButton" type="submit" > Add Text</button>
+                <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)} style={{width:800}}></input>
+            <button onClick={addText} className="submitButton" type="submit"> Add Text</button>
             </div>
             <div>
             <input type="file" onChange={handleFile} />
