@@ -155,8 +155,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             }))
             setEdges(tempedges)
             setcolormap(tempcolor)
-            setsentence(current.text)
-            setjson({nodes:JSON.stringify({nodes:current.nodes}),edges:JSON.stringify({edges:current.edges}),text:JSON.stringify({text:current.text})})
+            setsentence(current.text)   
+            setjson({nodes:JSON.stringify({nodes:current.nodes}).slice(1,-1),edges:JSON.stringify({edges:current.edges}).slice(1,-1),text:JSON.stringify({text:current.text}).slice(1,-1)})
+            console.log(current)
         }
     },[files,fileindex]);
     const saveFile = (e) =>{
