@@ -9,6 +9,7 @@ import Form from './Form'
 import React, {useEffect, useState} from 'react'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
 import Changefileindex from './Changefileindex';
+import TOC from './TOC'
 const edgeTypes = {
 	smart: SmartBezierEdge
 }
@@ -65,10 +66,13 @@ const OverviewFlow = () => {
       <h2>Knowledge Graph Visualizer</h2>
       <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
       <ColorPara colors={colors}>{sentence}</ColorPara>
-      {files&&<h3>Inputted file JSON text</h3>}
+      {files&&<h3>Inputted file JSON data</h3>}
       <p>{json.nodes}</p>
       <p>{json.edges}</p>
       <p>{json.text}</p>
+      {files&&<h2>File Table of Contents</h2>}
+      {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
+      {files&&<h1 style={{position:'absolute', right:450}}>{files[fileindex].title}</h1>}
       <div style={{height: 800}}>
       <ReactFlow
       edgeTypes={edgeTypes}
