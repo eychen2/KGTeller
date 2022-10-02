@@ -190,7 +190,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             <button onClick={addText} className="submitButton" type="submit"> Add Text</button>
             </div>
             <div>
-            <input type="file" onChange={handleFile} />
+            <input type="file" onChange={handleFile}/>
             </div>
             <div>
             <button onClick={saveFile} className="submitButton" type="submit" >Save File</button>

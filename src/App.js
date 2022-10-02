@@ -10,6 +10,10 @@ import React, {useEffect, useState} from 'react'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
 import Changefileindex from './Changefileindex';
 import TOC from './TOC'
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import 'bootstrap/dist/css/bootstrap.min.css'
 const edgeTypes = {
 	smart: SmartBezierEdge
 }
@@ -63,18 +67,27 @@ const OverviewFlow = () => {
           The clear all button resets everything.
         </p>
       </div>
+      <div align='center'>
       <h2>Knowledge Graph Visualizer</h2>
-      <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
       <ColorPara colors={colors}>{sentence}</ColorPara>
-      {files&&<h3>Inputted file JSON data</h3>}
+      </div>
+      <div align='center'>
+        {files&&<h2>File Table of Contents</h2>}
+      {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
+      {files&&<h1 style={{right:450}}>{files[fileindex].title}</h1>}
+      </div>
+    
+     <Container>
+      <Row>
+        
+        <Col>
+        {files&&<h3>Inputted file JSON data</h3>}
       <p>{json.nodes}</p>
       <p>{json.edges}</p>
       <p>{json.text}</p>
-      {files&&<h2>File Table of Contents</h2>}
-      {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
-      {files&&<h1 style={{position:'absolute', right:450}}>{files[fileindex].title}</h1>}
-      <div style={{height: 800}}>
-      <ReactFlow
+        </Col>
+        <Col xs={6}>
+        <ReactFlow
       edgeTypes={edgeTypes}
       nodes={nodes}
       edges={edges}
@@ -82,27 +95,22 @@ const OverviewFlow = () => {
       onEdgesChange={onEdgesChange}
       fitView
     >
-      <MiniMap
-        nodeStrokeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-          if (n.type === 'input') return '#0041d0';
-          if (n.type === 'output') return '#ff0072';
-          if (n.type === 'default') return '#1a192b';
-
-          return '#eee';
-        }}
-        nodeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-
-          return '#fff';
-        }}
-        nodeBorderRadius={2}
-      />
       <Controls />
-      <Background color="#aaa" gap={16} />
+
     </ReactFlow>
-      </div>
-      <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
+        </Col>
+      </Row>
+        <Row>
+          <Col>
+          <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
+          </Col>
+          <Col>
+          <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
+          </Col>
+        </Row>
+         
+      </Container>
+     
     </div>
 
     

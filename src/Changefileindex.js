@@ -1,3 +1,4 @@
+import {Button} from 'react-bootstrap'
 const Changefileindex = ({files, fileindex, setfileindex})=>{
     const goPrevious= (e) =>{
         e.preventDefault()
@@ -13,8 +14,8 @@ const Changefileindex = ({files, fileindex, setfileindex})=>{
     return(
         <form>
             <div>
-                {fileindex>0&&<button onClick={goPrevious} className="submitButton" type="submit" style={{position:'absolute', right:450}}>Previous</button>}
-                {fileindex<files.length-1&&<button onClick={goNext} className="submitButton" type="submit" style={{position:'absolute', right:400}}>Next</button>}
+                {fileindex>0&&<Button onClick={goPrevious} className="submitButton" type="submit" style={{position:'absolute', right:450}}>Previous</Button>}
+                {fileindex<files.length-1&&<Button onClick={goNext} className="submitButton" type="submit" style={{position:'absolute', right:400}}>Next</Button>}
             </div>
                 
         </form>
