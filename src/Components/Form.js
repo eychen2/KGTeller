@@ -26,7 +26,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
-            setElements([...elements, {id: node.toLowerCase(), data: {label: node},position:{x:0,y:700}, style:{color: colors[elements.length]}}].sort((a, b) => {
+            setElements([...elements, {id: node.toLowerCase(), data: {label: node},position:{x:0,y:400}, style:{color: colors[elements.length]}}].sort((a, b) => {
                 return a.id.length - b.id.length;
             }));
             setcolormap(colormap.set(node.toLowerCase(),colors[elements.length]))
