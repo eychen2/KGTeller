@@ -3,6 +3,7 @@ import ReactFlow, {
     useNodesState,
     useEdgesState,
   } from 'react-flow-renderer';
+  import FileStuff from '../Components/FileStuff'
   import Form from '../Components/Form'
   import React, {useState} from 'react'
   import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
@@ -76,6 +77,9 @@ import ReactFlow, {
         </div>
       
        <Container>
+        <Row>
+          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} />
+        </Row>
         <Row style={{height:600}}>
           
           <Col>

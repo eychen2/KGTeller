@@ -113,15 +113,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsentence_holder('');
         
         },[elements,temp]);
-    const handleFile = e => {
-        filereader.readAsText(e.target.files[0], "UTF-8");
-    }
-    useEffect(()=> {
-        filereader.onload = e => {
-            Reset();
-            setFiles(JSON.parse(e.target.result));
-        }; 
-    },[filereader]);
     useEffect(()=> { 
         console.log(fileindex)
         const current = files[fileindex]
@@ -160,18 +151,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             console.log(current)
         }
     },[files,fileindex]);
-    const saveFile = (e) =>{
-        e.preventDefault();
-        var tempnodes=[];
-        var tempedges=[];
-        for(var i=0; i<elements.length;++i)
-            tempnodes.push(elements[i].id);
-        for(var i=0; i<edges.length;++i)
-            tempedges.push({source: edges[i].source, target: edges[i].target, label: edges[i].label})
-        var tempjson = {nodes: tempnodes, edges: tempedges, text: temp}
-        var filestring= JSON.stringify(tempjson)
-        download('['+filestring+']',"data.json","text/plain");
-    }
     return(
         <form>
             <div>
@@ -186,15 +165,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             </div>
 
             <div>
-                <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)} style={{width:800}}></input>
+                <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)} style={{width:500}}></input>
             <button onClick={addText} className="submitButton" type="submit"> Add Text</button>
-            </div>
-            <div>
-            <input type="file" onChange={handleFile}/>
-            </div>
-            <div>
-            <button onClick={saveFile} className="submitButton" type="submit" >Save File</button>
-
             </div>
             <div>
             <button onClick={Reset} className="submitButton" type="submit" >Clear all</button>
