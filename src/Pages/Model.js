@@ -1,6 +1,7 @@
 import React from 'react'
 import Form from 'react-bootstrap/Form';
-
+import Button from 'react-bootstrap/Button';
+import axios from 'axios'
 const Model = () =>{
     const fileRead = e => {
         e.preventDefault();
@@ -13,6 +14,11 @@ const Model = () =>{
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
+
+    }
+    const getPred = e => {
+        e.preventDefault()
+        console.log("Reached")
     }
     return(
         <div className='app'>
@@ -32,6 +38,11 @@ const Model = () =>{
                     <Form.Label>Default file input example</Form.Label>
                     <Form.Control type="file" />
                     </Form.Group>
+                </Form>
+                <Form>
+                    <Button variant="primary" type="submit" onClick={getPred}>
+                     Predict
+                    </Button>
                 </Form>
             </div>
         </div>
