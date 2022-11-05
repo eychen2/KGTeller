@@ -1,24 +1,35 @@
-import React from 'react'
+import React, {useState}from 'react'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios'
 const Model = () =>{
+    const [files, setFiles] = useState("");
+    const [prediction, setPrediction] = useState(null);
     const fileRead = e => {
         e.preventDefault();
         var filereader=new FileReader();
         filereader.readAsText(e.target.files[0], "UTF-8");
         filereader.onload = e => {
-            console.log(JSON.parse(e.target.result));
+            setFiles(JSON.parse(e.target.result));
         }; 
     }
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
-
+        console.log(prediction)
     }
-    const getPred = e => {
+    const getPred = async e => {
         e.preventDefault()
         console.log("Reached")
+        console.log(JSON.stringify(files[0]))
+        axios.post("/predict",
+        {
+            data:JSON.stringify(files[0])
+        })
+        .then(function (response) {
+            console.log(response);
+            setPrediction(response['data']['data']);
+          })
     }
     return(
         <div className='app'>
@@ -44,6 +55,7 @@ const Model = () =>{
                      Predict
                     </Button>
                 </Form>
+                {prediction&& <h2> The prediction is: {prediction}</h2>}
             </div>
         </div>
     );

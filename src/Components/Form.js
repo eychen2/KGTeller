@@ -57,7 +57,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsource('');
         settarget('');
         setlabel('');
-        },[edge])
+        },[edge,edges])
     const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
