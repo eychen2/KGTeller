@@ -82,12 +82,12 @@ import ReactFlow, {
         </Row>
         <Row style={{height:600}}>
           
-          <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
+          {files&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           {files&&<h3>Inputted file JSON data</h3>}
         <p>{json.nodes}</p>
         <p>{json.edges}</p>
         <p>{json.text}</p>
-          </Col>
+          </Col>}
           <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           <ReactFlow
         edgeTypes={edgeTypes}
