@@ -2,9 +2,12 @@ import React, {useState}from 'react'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios'
+import TOC from '../Components/TOC'
 const Model = () =>{
     const [files, setFiles] = useState("");
     const [prediction, setPrediction] = useState(null);
+    const [fileindex,setfileindex]= useState(0);
+    const [used,setUsed]= useState(false);
     const fileRead = e => {
         e.preventDefault();
         var filereader=new FileReader();
@@ -12,22 +15,22 @@ const Model = () =>{
         filereader.onload = e => {
             setFiles(JSON.parse(e.target.result));
         }; 
+        setUsed(false)
     }
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
         console.log(prediction)
+        setUsed(true)
     }
     const getPred = async e => {
         e.preventDefault()
         console.log("Reached")
-        console.log(JSON.stringify(files[0]))
         axios.post("/predict",
         {
-            data:JSON.stringify(files[0])
+            data:JSON.stringify(files[fileindex])
         })
         .then(function (response) {
-            console.log(response);
             setPrediction(response['data']['data']);
           })
     }
@@ -39,7 +42,7 @@ const Model = () =>{
             </div>
             <div>
                 <Form.Select aria-label="Model chooser" onChange={modelSelect}>
-                    <option value="-1">Select Model</option>
+                    {!used&&<option value="-1">Select Model</option>}
                     <option value="1">Model 1</option>
                     <option value="2">Model 2</option>
                     <option value="3">Model 3</option>
@@ -50,6 +53,7 @@ const Model = () =>{
                     <Form.Control type="file" />
                     </Form.Group>
                 </Form>
+                {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
                 <Form>
                     <Button variant="primary" type="submit" onClick={getPred}>
                      Predict

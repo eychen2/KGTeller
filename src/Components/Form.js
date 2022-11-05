@@ -9,6 +9,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
+    const [updateedge,setupdateEdge] = useState({source:'', target:'', label:''})
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const Reset = () => {
         setElements([]);
@@ -38,7 +39,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     };
     useEffect(()=> {
         var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
-        console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
             setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source, target:target, label:label, markerEnd: {
@@ -47,9 +47,11 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         }
         if(index!==-1&&label!=='')
         {
+            
             const updateedge=edges
             updateedge[index].label=updateedge[index].label+", "+label
             setEdges(updateedge)
+            console.log(edges)
         }
         setsource('');
         settarget('');
@@ -61,7 +63,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
-        var textcolors= Array(temp2.length).fill('black');
         setElements(elements.sort((a, b) => {
             return a.id.length - b.id.length;
         }));

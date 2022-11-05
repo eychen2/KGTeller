@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import Form from 'react-bootstrap/Form';
+
 const TOC = ({files, fileindex, setfileindex})=>{
     const [used,setUsed]=useState(false);
     const handleChange= (e) =>{
@@ -11,18 +13,15 @@ const TOC = ({files, fileindex, setfileindex})=>{
         setUsed(true);
     };
     return(
-        <form>
-            <label>
-                <select id="graphlist" onChange={handleChange}>
+        <Form.Select onChange={handleChange}>
+
                     {!used&&<option value={-1}>
                         Select which graph you want to render from the file
                     </option>}
                     {Object.entries(files).map((key, value) => {
                         return <option value={value}>{key[1].title}</option>;
-                })}
-                </select>
-            </label>
-        </form>
+                        })}
+        </Form.Select>
     )
 }
 export default TOC;
