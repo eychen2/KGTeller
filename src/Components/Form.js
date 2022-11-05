@@ -9,7 +9,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
-    const [filereader, setfilereader] = useState(new FileReader());
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const Reset = () => {
         setElements([]);
@@ -48,16 +47,17 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         }
         if(index!==-1&&label!=='')
         {
-            console.log('reached')
             const updateedge=edges
             updateedge[index].label=updateedge[index].label+", "+label
             setEdges(updateedge)
-            console.log(edges)
         }
         setsource('');
         settarget('');
         setlabel('');
-        },[edge,edges])
+        },[edge])
+    useEffect(()=> {
+        console.log(edges)
+    }, [edges])
     const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
