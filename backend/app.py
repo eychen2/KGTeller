@@ -8,7 +8,8 @@ app = Flask(__name__)
 @app.route('/predict', methods=['POST'])
 def predict():
     #load model
-    #model=
+    #model=load_model()
     formData=request.get_json()
+    #Probably some data manipulation stuff
     #prediction=model.predict(data)
     return formData
