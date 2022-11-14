@@ -76,7 +76,7 @@ import ReactFlow, {
         </div>
        <Container>
         <Row>
-          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} map1={map1} map2={map2} />
+          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
         </Row>
         <Row style={{height:600}}>
           
@@ -101,8 +101,7 @@ import ReactFlow, {
           <Row>
             <Col>
             <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} 
-            setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} 
-            map1={map1} setmap1={setmap1} map2={map2} setmap2={setmap2}/>
+            setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} />
             </Col>
             <Col>
             <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
