@@ -8,10 +8,11 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [sentence_holder, setsentence_holder] = useState('');
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
+    const [map1, setmap1] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
-    const [updateedge,setupdateEdge] = useState({source:'', target:'', label:''})
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
-    const Reset = () => {
+    const Reset = (e) => {
+        e.preventDefault()
         setElements([]);
         setEdges([]);
         settemp("");
@@ -45,21 +46,30 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 type: "arrowclosed", color: 'black'
               },style: { stroke: 'black' }}])//style:{stroke: colors[elements.length]}}])
         }
-        if(index!==-1&&label!=='')
-        {
+        else if(label!=''){
             
-            const updateedge=edges
-            updateedge[index].label=updateedge[index].label+", "+label
-            setEdges(updateedge)
-            console.log(edges)
-        }
-        setsource('');
-        settarget('');
-        setlabel('');
+            let update = [...edges]
+            let test = update[index].label.split(/\s*,\s*/)
+            let seen=false
+            for(const i in test)
+            {
+                if(test[i]===label)
+                {
+                    seen=true
+                    break;
+                }
+            }
+            if(!seen)
+            {
+                update[index].label+=', '+label
+                setEdges(update)
+            }
+        }      
+        setsource("")
+        settarget("")
+        setlabel("")
+        setEdge("")
         },[edge])
-    useEffect(()=> {
-        console.log(edges)
-    }, [edges])
     const addText = (e) =>{
         e.preventDefault();
         var temp2 = (" "+temp+" ").toLowerCase();
@@ -73,6 +83,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     useEffect(()=> {
         var temp2 = (" "+temp+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
+        console.log(temp2)
         for(const x of elements)
         {
             var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
@@ -112,44 +123,65 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         realcolors.pop();
         setcolors(realcolors);
         setsentence_holder('');
-        
         },[elements,temp]);
     useEffect(()=> { 
-        console.log(fileindex)
         const current = files[fileindex]
-        console.log(current)
         if(current)
         {
             var tempnodes=[];
-            const length = current.nodes.length
             let tempcolor= new Map()
             let y=4;
-            for(var i=0; i<length;++i)
-            {
-                tempnodes.push({id: current.nodes[i].toLowerCase(), data: {label: current.nodes[i]},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}})
+            let i=0
+            let store =current.entity_ref_dict
+            for (const access in store) {
+                map1.set(access.toLowerCase(),store[access].toLowerCase())
+            }
+            for (let [key, value] of map1) {
+                //do arrays instead of lists
+                var node = [{id: value.toLowerCase(), data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
                 if(i%4===3)
                     y-=1;
-                tempcolor.set(current.nodes[i].toLowerCase(),colors[tempnodes.length-1])
+                tempnodes.push(node[0])
+                tempcolor.set(value.toLowerCase(),colors[tempnodes.length-1])
+                i=i+1
             }
             var tempedges=[];
-            const elength = current.edges.length;
-            for(var i=0; i<elength;++i)
+            for (const access in current.keep_triples)
             {
-                tempedges.push({id: (i).toString(), type: 'smart', source:current.edges[i].source.toLowerCase(), 
-                target:current.edges[i].target.toLowerCase(), label:current.edges[i].label, markerEnd: {
+                let index=-1
+                if(tempedges.length!=0)
+                    index = tempedges.findIndex(x=>(x.source.toLowerCase()===current.keep_triples[access][0].toLowerCase() && x.target.toLowerCase()===current.keep_triples[access][2].toLowerCase()))
+                if(index===-1)
+                {
+                    
+                    tempedges.push({id: (access).toString(), type: 'smart', source:current.keep_triples[access][0].toLowerCase(), 
+                    target:current.keep_triples[access][2].toLowerCase(), label:current.keep_triples[access][1], markerEnd: {
                     type: "arrowclosed", color: 'black'
-                  },style: { stroke: 'black' }})
+                  },style: { stroke: 'black' }})   
+                }
+                else
+                {
+                    if(tempedges.length!=0)
+                    {
+                        tempedges[index].label+=", "+current.keep_triples[access][1]
+                    }
+                }
             }
-            console.log(current.text)
-            settemp(current.text)
             setElements(tempnodes.sort((a, b) => {
                 return a.id.length - b.id.length;
             }))
             setEdges(tempedges)
+            let text = current.narration
+            var re = new RegExp(Object.keys(store).join("|"),"gi");
+            text = text.replace(re, function(matched){
+                return map1.get(matched);
+            });
+            console.log(tempcolor)
             setcolormap(tempcolor)
-            setsentence(current.text)   
-            setjson({nodes:JSON.stringify({nodes:current.nodes}).slice(1,-1),edges:JSON.stringify({edges:current.edges}).slice(1,-1),text:JSON.stringify({text:current.text}).slice(1,-1)})
-            console.log(current)
+            settemp(text)
+            setsentence(text)
+            setjson(JSON.stringify(current))
+
         }
     },[files,fileindex]);
     return(
