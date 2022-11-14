@@ -40,9 +40,8 @@ import ReactFlow, {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [sentence, setsentence] = useState('');
     const [colors, setcolors] = useState([]);
-    const [json, setjson] = useState({nodes:'',edges:'', text:''});
+    const [json, setjson] = useState();
     const [files, setFiles] = useState("");
-    
     return (
       <div className = "app">
         <div align='center'>
@@ -70,23 +69,20 @@ import ReactFlow, {
         <div align='center'>
           {files&&<h2>File Table of Contents</h2>}
         {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
-        {files&&<h1 style={{right:450}}>{files[fileindex].title}</h1>}
+        {files&&<h1 style={{right:450}}>{files[fileindex].Event_Name}</h1>}
         </div>
         <div align='center'>
             <ColorPara colors={colors}>{sentence}</ColorPara>
         </div>
-      
        <Container>
         <Row>
-          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} />
+          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} map1={map1} map2={map2} />
         </Row>
         <Row style={{height:600}}>
           
           {files&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           {files&&<h3>Inputted file JSON data</h3>}
-        <p>{json.nodes}</p>
-        <p>{json.edges}</p>
-        <p>{json.text}</p>
+          <p>{json}</p>
           </Col>}
           <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           <ReactFlow
@@ -104,7 +100,9 @@ import ReactFlow, {
         </Row>
           <Row>
             <Col>
-            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
+            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} 
+            setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} 
+            map1={map1} setmap1={setmap1} map2={map2} setmap2={setmap2}/>
             </Col>
             <Col>
             <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>

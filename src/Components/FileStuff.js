@@ -13,6 +13,7 @@ const FileStuff=({elements, setElements, edges, sentence, setsentence, setjson, 
         }; 
     },[filereader]);
     const saveFile = (e) =>{
+        //y
         e.preventDefault();
         var tempnodes=[];
         var tempedges=[];
