@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import download from 'downloadjs';
-const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles}) =>{
+const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
+    const [name, setname] = useState('');
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
@@ -8,20 +9,24 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [sentence_holder, setsentence_holder] = useState('');
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
-    const [map1, setmap1] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
     const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const Reset = (e) => {
-        e.preventDefault()
         setElements([]);
         setEdges([]);
         settemp("");
         setsentence_holder("");
         setcolormap(colormap.clear());
+        setcm(cm.clear())
         setcolors([]);
         setFiles("");
         setfileindex(0);
       }
+    const addTitle = (e) =>{
+        e.preventDefault()
+        setTitle(name)
+        setname("")
+    }
     const addNode = (e) => {
         e.preventDefault();
         var index = elements.findIndex(x=>x.id===node)
@@ -31,6 +36,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 return a.id.length - b.id.length;
             }));
             setcolormap(colormap.set(node.toLowerCase(),colors[elements.length]))
+            setcm(cm.set(colors[elements.length],node))
         }
         setnode("");
     };
@@ -83,7 +89,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     useEffect(()=> {
         var temp2 = (" "+temp+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
-        console.log(temp2)
         for(const x of elements)
         {
             var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
@@ -124,28 +129,32 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setcolors(realcolors);
         setsentence_holder('');
         },[elements,temp]);
-    useEffect(()=> { 
+    useEffect(()=> {
         const current = files[fileindex]
         if(current)
         {
-            var tempnodes=[];
+            setTitle(current.Event_Name)
+            let map1 = new Map()
+            const tempnodes=[];
             let tempcolor= new Map()
             let y=4;
             let i=0
             let store =current.entity_ref_dict
             for (const access in store) {
-                map1.set(access.toLowerCase(),store[access].toLowerCase())
+                map1.set(access.toLowerCase(),store[access])
             }
             for (let [key, value] of map1) {
                 //do arrays instead of lists
-                var node = [{id: value.toLowerCase(), data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
+                var node = [{id: value, data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
                 if(i%4===3)
                     y-=1;
                 tempnodes.push(node[0])
-                tempcolor.set(value.toLowerCase(),colors[tempnodes.length-1])
+                tempcolor.set(value,colors[tempnodes.length-1])
+                setcm(cm.set(colors[tempnodes.length-1],value))
                 i=i+1
             }
-            var tempedges=[];
+            console.log(tempnodes)
+            const tempedges=[];
             for (const access in current.keep_triples)
             {
                 let index=-1
@@ -154,8 +163,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 if(index===-1)
                 {
                     
-                    tempedges.push({id: (access).toString(), type: 'smart', source:current.keep_triples[access][0].toLowerCase(), 
-                    target:current.keep_triples[access][2].toLowerCase(), label:current.keep_triples[access][1], markerEnd: {
+                    tempedges.push({id: (access).toString(), type: 'smart', source:current.keep_triples[access][0], 
+                    target:current.keep_triples[access][2], label:current.keep_triples[access][1], markerEnd: {
                     type: "arrowclosed", color: 'black'
                   },style: { stroke: 'black' }})   
                 }
@@ -174,18 +183,21 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             let text = current.narration
             var re = new RegExp(Object.keys(store).join("|"),"gi");
             text = text.replace(re, function(matched){
-                return map1.get(matched);
+                return map1.get(matched.toLowerCase());
             });
-            console.log(tempcolor)
             setcolormap(tempcolor)
             settemp(text)
             setsentence(text)
             setjson(JSON.stringify(current))
-
+            console.log(cm)
         }
     },[files,fileindex]);
     return(
         <form>
+            <div>
+            <input type="name" value={node} placeholder="Event Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
+            <button onClick={addTitle} className="submitButton" type="submit" > Add Event Name</button>
+            </div>
             <div>
             <input type="text" value={node} placeholder="Node Name" onChange={(e)=> setnode(e.target.value)}></input>
             <button onClick={addNode} className="submitButton" type="submit" > Add Node</button>

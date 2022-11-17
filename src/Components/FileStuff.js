@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import download from 'downloadjs';
 import Form from 'react-bootstrap/Form';
-const FileStuff=({elements, setElements, edges, sentence, setsentence, setjson, fileindex, setfileindex, files, setFiles}) =>{
+const FileStuff=({elements, edges, sentence, setfileindex, setFiles, cm, title, colors}) =>{
     const [filereader, setfilereader] = useState(new FileReader());
     const fileRead = e => {
         filereader.readAsText(e.target.files[0], "UTF-8");
@@ -14,16 +14,23 @@ const FileStuff=({elements, setElements, edges, sentence, setsentence, setjson, 
     },[filereader]);
     const saveFile = (e) =>{
         //y
-        e.preventDefault();
-        var tempnodes=[];
-        var tempedges=[];
-        for(var i=0; i<elements.length;++i)
-            tempnodes.push(elements[i].id);
-        for(var i=0; i<edges.length;++i)
-            tempedges.push({source: edges[i].source, target: edges[i].target, label: edges[i].label})
-        var tempjson = {nodes: tempnodes, edges: tempedges, text: sentence}
-        var filestring= JSON.stringify(tempjson)
-        download('['+filestring+']',"data.json","text/plain");
+        var filestring = "[{"
+        filestring+="\"Event Name\": \""+title+"\","
+        filestring+="\"keep_triples\": ["
+        for (const x in edges)
+        {
+            console.log(edges[x])
+            const labels =edges[x].label.split(", ")
+            for(var i =0; i<labels.length;++i)
+            {
+                filestring+="[\""+edges[x].source+"\", \""+labels[i]+"\", \""+edges[x].target+"\"], "
+            }
+
+        }
+        filestring=filestring.slice(0,-2)
+        filestring+="]"
+        filestring+="}]"
+        download(filestring,"data.json","text/plain");
     }
     return(
         <div>

@@ -14,8 +14,8 @@ const Changefileindex = ({files, fileindex, setfileindex})=>{
     return(
         <form>
             <div>
-                {fileindex>0&&<Button onClick={goPrevious} className="submitButton" type="submit" style={{position:'absolute', right:450}}>Previous</Button>}
-                {fileindex<files.length-1&&<Button onClick={goNext} className="submitButton" type="submit" style={{position:'absolute', right:400}}>Next</Button>}
+                {fileindex>0&&<Button onClick={goPrevious} className="submitButton" type="submit">Previous</Button>}
+                {fileindex<files.length-1&&<Button onClick={goNext} className="submitButton" type="submit">Next</Button>}
             </div>
                 
         </form>

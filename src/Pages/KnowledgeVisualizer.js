@@ -39,9 +39,11 @@ import ReactFlow, {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [sentence, setsentence] = useState('');
-    const [colors, setcolors] = useState([]);
+    const [colors, setcolors] = useState([])
+    const [cm, setcm] = useState(new Map())
     const [json, setjson] = useState();
     const [files, setFiles] = useState("");
+    const [title, setTitle] = useState("");
     return (
       <div className = "app">
         <div align='center'>
@@ -69,18 +71,21 @@ import ReactFlow, {
         <div align='center'>
           {files&&<h2>File Table of Contents</h2>}
         {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
-        {files&&<h1 style={{right:450}}>{files[fileindex].Event_Name}</h1>}
+        {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
             <ColorPara colors={colors}>{sentence}</ColorPara>
         </div>
        <Container>
         <Row>
-          <FileStuff elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles}/>
+          <FileStuff elements={nodes} edges={edges} setEdges={setEdges} sentence={sentence} setfileindex={setfileindex} setFiles={setFiles} cm={cm} title={title} colors={colors}/>
         </Row>
         <Row style={{height:600}}>
           
-          {files&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
+          {files&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
+                                overflowY: 'auto',
+                                maxHeight:600
+                                }}>
           {files&&<h3>Inputted file JSON data</h3>}
           <p>{json}</p>
           </Col>}
@@ -99,9 +104,9 @@ import ReactFlow, {
           </Col>
         </Row>
           <Row>
-            <Col>
+            <Col xs={10}>
             <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} 
-            setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} />
+            setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} setTitle={setTitle} cm={cm} setcm={setcm}/>
             </Col>
             <Col>
             <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
