@@ -1,0 +1,12 @@
+{
+  "models": [
+    { "value": "GraphWriter",
+      "display": "GraphWriter" },
+    { "value": "BART",
+      "display": "BART" },
+    { "value": "JointGT",
+      "display": "JointGT" },
+    { "value": "GAP",
+      "display": "GAP" }
+  ]
+}

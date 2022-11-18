@@ -1,65 +1,44 @@
 import os
 import json
-#not used?
 import re
-#not used?
 import string
-#for concat
 import numpy as np
 from tqdm import tqdm
-#for error
-import sys
-#for copy
 import copy
-#for pretrain
-import random
-#not used?
-import time
 
 import torch
 from torch.utils.data import Dataset, TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
-
 def get_t_emb_dim(args):
-    t_emb_dim = int(args.entity_entity)+int(args.entity_relation)\
-        +int(args.relation_entity)+int(args.relation_relation)
+    t_emb_dim = int(args['entity_entity'])+int(args['entity_relation'])\
+        +int(args['relation_entity'])+int(args['relation_relation'])+1
     return t_emb_dim
         
-
 class EventDataLoader(DataLoader):
 
     def __init__(self, args, dataset, mode):
         if mode == "train":
             sampler = RandomSampler(dataset)
-            batch_size = args.train_batch_size
+            batch_size = args['train_batch_size']
         else:
             sampler = SequentialSampler(dataset)
-            batch_size = args.predict_batch_size
+            batch_size = args['predict_batch_size']
         super(EventDataLoader, self).__init__(dataset, sampler=sampler, batch_size=batch_size,
-                                               num_workers=args.num_workers)
+                                               num_workers=args['num_workers'])
 
 class EventDataset(Dataset):
-    def __init__(self, logger, args, data_path, tokenizer, mode):
-        self.data_path = data_path
+    def __init__(self, args, data, tokenizer, mode):
         self.tokenizer = tokenizer
-        self.topology = {"entity-entity": args.entity_entity, 
-                           "entity-relation": args.entity_relation,
-                           "relation-entity": args.relation_entity,
-                           "relation-relation": args.relation_relation
+        self.topology = {"entity-entity": args['entity_entity'], 
+                           "entity-relation": args['entity_relation'],
+                           "relation-entity": args['relation_entity'],
+                           "relation-relation": args['relation_relation']
                           }                        
                         
                         
-        with open(self.data_path+ '.source') as f:
-            source_kgs = [sample.rstrip('\n') for sample in f]
-       
-        with open(self.data_path+ '.target.tok') as f:
-            target_texts = [sample.rstrip('\n') for sample in f]
-        
-        self.data = list(zip(source_kgs, target_texts))
-        print("Total samples = {}".format(len(self.data)))
 
-        if args.debug:
-            self.data = self.data[:1000]
+        
+        self.data = data
         assert type(self.data) == list
         self.args = args
         self.data_type = mode
@@ -70,15 +49,15 @@ class EventDataset(Dataset):
         self.graph_ids, self.text_ids = self.tokenizer.encode(' [graph]', add_special_tokens=False), \
                                         self.tokenizer.encode(' [text]', add_special_tokens=False)
 
-        if self.args.model_name == "bart":
+        if self.args['model_name'] == "bart":
             self.mask_token = self.tokenizer.mask_token
             self.mask_token_id = self.tokenizer.mask_token_id
         else:
             self.mask_token = self.tokenizer.additional_special_tokens[0]
             self.mask_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.additional_special_tokens[0])
 
-        if self.args.model_name == "bart":
-            if self.args.append_another_bos:
+        if self.args['model_name'] == "bart":
+            if self.args['append_another_bos']:
                 self.add_bos_id = [self.tokenizer.bos_token_id] * 2
             else:
                 self.add_bos_id = [self.tokenizer.bos_token_id]
@@ -118,7 +97,6 @@ class EventDataset(Dataset):
                         relation_change, cnt_edge, adj_matrix):
         # string_label: encoder ids
         # string_label_tokens: encoder tokens
-        
         if len(triple[0]) == 0:
             return [], '', [], [], cnt_edge, adj_matrix
         nodes, edges = [], []
@@ -134,7 +112,7 @@ class EventDataset(Dataset):
         edges.extend([-1] * len(entity_change[triple[0]][0]))
 
 
-        # for rel in entity[2]:
+#         for rel in triple[2]:
         if len(triple[1]) != 0 and len(triple[2]) != 0:
             rel_label = relation_change[triple[1]]
             rel_ent_label = entity_change[triple[1]][1]
@@ -148,18 +126,18 @@ class EventDataset(Dataset):
                         len(tail_ids) + len(entity_change[triple[2]][0])))
             if entity_change[triple[0]][1] < len(adj_matrix) and entity_change[triple[2]][1] < len(adj_matrix):
 
-               
+
                 if self.topology['entity-entity']:
                     adj_matrix[entity_change[triple[0]][1]][entity_change[triple[2]][1]] = 1
                     adj_matrix[entity_change[triple[2]][1]][entity_change[triple[0]][1]] = 1
-                    
+
                 if self.topology['entity-relation']:
-                    adj_matrix[entity_change[entity[0]][1]][entity_change[rel[0]][1]] = 2
-                    adj_matrix[entity_change[rel[1]][1]][entity_change[rel[0]][1]] = 2
-                    
+                    adj_matrix[entity_change[triple[0]][1]][entity_change[triple[1]][1]] = 2
+                    adj_matrix[entity_change[triple[2]][1]][entity_change[triple[1]][1]] = 2
+
                 if self.topology['relation-entity']:
-                    adj_matrix[entity_change[rel[0]][1]][entity_change[rel[1]][1]] = 3
-                    adj_matrix[entity_change[rel[0]][1]][entity_change[entity[0]][1]] = 3
+                    adj_matrix[entity_change[triple[1]][1]][entity_change[triple[0]][1]] = 3
+                    adj_matrix[entity_change[triple[2]][1]][entity_change[triple[1]][1]] = 3
                     
                 if not self.topology['relation-entity'] and not self.topology['relation-relation']:
                     adj_matrix[entity_change[triple[1]][1]][entity_change[triple[1]][1]] = 10
@@ -167,7 +145,7 @@ class EventDataset(Dataset):
                 if not self.topology['entity-relation'] and not self.topology['entity-entity']:
                     adj_matrix[entity_change[triple[0]][1]][entity_change[triple[0]][1]] = 10
                     adj_matrix[entity_change[triple[2]][1]][entity_change[triple[2]][1]] = 10
-                               
+
             cnt_edge += 1
             string_label += words_label
             string_label_tokens += words_label_tokens
@@ -231,7 +209,7 @@ class EventDataset(Dataset):
 
     def truncate_pair_ar(self, a, add_bos_id, graph_ids, text_ids, node_ids, edge_ids):
         # add_bos_id + graph_ids + a + text_ids + b + eos_token_id
-        length_a_b = self.args.max_input_length - len(add_bos_id) - len(graph_ids) - len(text_ids) - 1
+        length_a_b = self.args['max_input_length'] - len(add_bos_id) - len(graph_ids) - len(text_ids) - 1
         if len(a) > length_a_b:
             a = a[:length_a_b]
             node_ids = node_ids[:length_a_b]
@@ -239,33 +217,24 @@ class EventDataset(Dataset):
         input_ids = add_bos_id + graph_ids + a + text_ids + [self.tokenizer.eos_token_id]
         input_node_ids = [-1] * (len(add_bos_id) + len(graph_ids)) + node_ids + [-1] * (len(text_ids) + 1)
         input_edge_ids = [-1] * (len(add_bos_id) + len(graph_ids)) + edge_ids + [-1] * (len(text_ids) + 1)
-        attn_mask = [1] * len(input_ids) + [0] * (self.args.max_input_length - len(input_ids))
-        input_ids += [self.tokenizer.pad_token_id] * (self.args.max_input_length - len(input_ids))
-        input_node_ids += [-1] * (self.args.max_input_length - len(input_node_ids))
-        input_edge_ids += [-1] * (self.args.max_input_length - len(input_edge_ids))
-        assert len(input_ids) == len(attn_mask) == self.args.max_input_length == len(input_node_ids) == len(
+        attn_mask = [1] * len(input_ids) + [0] * (self.args['max_input_length'] - len(input_ids))
+        input_ids += [self.tokenizer.pad_token_id] * (self.args['max_input_length'] - len(input_ids))
+        input_node_ids += [-1] * (self.args['max_input_length'] - len(input_node_ids))
+        input_edge_ids += [-1] * (self.args['max_input_length'] - len(input_edge_ids))
+        assert len(input_ids) == len(attn_mask) == self.args['max_input_length'] == len(input_node_ids) == len(
             input_edge_ids)
         return input_ids, attn_mask, input_node_ids, input_edge_ids
 
-    def ar_prep_data(self, answers, questions, add_bos_id, graph_ids, text_ids, node_ids, edge_ids):
-        # add bos and eos
-        decoder_label_ids = copy.deepcopy(answers)
-        if len(decoder_label_ids) > self.args.max_output_length - len(add_bos_id) - 1:
-            decoder_label_ids = decoder_label_ids[:(self.args.max_output_length - len(add_bos_id) - 1)]
-        decoder_label_ids = add_bos_id + decoder_label_ids + [self.tokenizer.eos_token_id]
-        decoder_attn_mask = [1] * len(decoder_label_ids) + [0] * (self.args.max_output_length - len(decoder_label_ids))
-        decoder_label_ids += [self.tokenizer.pad_token_id] * (self.args.max_output_length - len(decoder_label_ids))
-        assert len(decoder_label_ids) == self.args.max_output_length == len(decoder_attn_mask)
-
+    def ar_prep_data(self, questions, add_bos_id, graph_ids, text_ids, node_ids, edge_ids):
         input_ids, input_attn_mask, input_node_ids, input_edge_ids = self.truncate_pair_ar(questions, add_bos_id,
                                                                                            graph_ids, text_ids,
                                                                                            node_ids, edge_ids)
 
-        return input_ids, input_attn_mask, decoder_label_ids, decoder_attn_mask, input_node_ids, input_edge_ids
+        return input_ids, input_attn_mask, input_node_ids, input_edge_ids
 
     def __getitem__(self, idx):
         entry = self.data[idx]
-        kg = entry[0]
+        kg = entry
 
         kg_list = []
         triple_list = kg.split('<S>')
@@ -285,7 +254,7 @@ class EventDataset(Dataset):
         
         text_entity, text_relation = self.get_all_entities_per_sample(kg_list)
         entity_change, relation_change = self.get_change_per_sample(text_entity, text_relation)
-        adj_matrix = [[-1] * (self.args.max_node_length + 1) for _ in range(self.args.max_node_length + 1)]
+        adj_matrix = [[-1] * (self.args['max_node_length'] + 1) for _ in range(self.args['max_node_length'] + 1)]
 
         cnt_edge = 0
 
@@ -305,18 +274,10 @@ class EventDataset(Dataset):
         if self.topology['relation-relation']:
             adj_matrix = self.relation_to_relation_fill(entity_change, relation_change, adj_matrix)
         
-        words_label_ids, words_label_tokens, words_input_ids, words_input_tokens = [], '', [], ''
-        current_text = entry[1]
-       
-        for word in current_text.split():
-            word_label_ids = self.tokenizer.encode(" {}".format(word), add_special_tokens=False)
-            word_label_tokens = copy.deepcopy(word)
-
-            words_label_ids += word_label_ids
-            words_label_tokens += ' ' + word_label_tokens
-
-        input_ids_ar, attn_mask_ar, decoder_label_ids, decoder_attn_mask, input_node_ids_ar, input_edge_ids_ar = \
-            self.ar_prep_data(words_label_ids, strings_label, self.add_bos_id, self.graph_ids,
+        words_input_ids, words_input_tokens = [], ''
+        
+        input_ids_ar, attn_mask_ar, input_node_ids_ar, input_edge_ids_ar = \
+            self.ar_prep_data(strings_label, self.add_bos_id, self.graph_ids,
                               self.text_ids, node_ids, edge_ids)
 
         node_length_ar = max(input_node_ids_ar) + 1
@@ -327,8 +288,8 @@ class EventDataset(Dataset):
             return [src[src_id] if src[src_id] != masked_value and src[src_id] < fill_value else fill_value for src_id
                     in range(len(src))]
 
-        input_node_ids_ar, input_edge_ids_ar = masked_fill(input_node_ids_ar, -1, self.args.max_node_length), \
-                                               masked_fill(input_edge_ids_ar, -1, self.args.max_edge_length)
+        input_node_ids_ar, input_edge_ids_ar = masked_fill(input_node_ids_ar, -1, self.args['max_node_length']), \
+                                               masked_fill(input_edge_ids_ar, -1, self.args['max_edge_length'])
 
         def masked_fill_matrix(adj_matrix_input, masked_value, fill_value):
             adj_matrix_tmp = copy.deepcopy(adj_matrix_input)
@@ -338,27 +299,17 @@ class EventDataset(Dataset):
                         adj_matrix_tmp[a_id][b_id] = fill_value
             return adj_matrix_tmp
 
-        adj_matrix_ar = masked_fill_matrix(adj_matrix, -1, self.args.max_edge_length)
+        adj_matrix_ar = masked_fill_matrix(adj_matrix, -1, self.args['max_edge_length'])
 
-        assert len(input_ids_ar) == len(attn_mask_ar) == self.args.max_input_length == len(input_node_ids_ar) == len(
+        assert len(input_ids_ar) == len(attn_mask_ar) == self.args['max_input_length'] == len(input_node_ids_ar) == len(
             input_edge_ids_ar)
-        assert len(decoder_label_ids) == len(decoder_attn_mask) == self.args.max_output_length
 
         input_ids_ar = torch.LongTensor(input_ids_ar)
         attn_mask_ar = torch.LongTensor(attn_mask_ar)
-        decoder_label_ids = torch.LongTensor(decoder_label_ids)
-        decoder_attn_mask = torch.LongTensor(decoder_attn_mask)
         input_node_ids_ar = torch.LongTensor(input_node_ids_ar)
         input_edge_ids_ar = torch.LongTensor(input_edge_ids_ar)
         node_length_ar = torch.LongTensor([node_length_ar])
         edge_length_ar = torch.LongTensor([edge_length_ar])
         adj_matrix_ar = torch.LongTensor(adj_matrix_ar)
        
-        return input_ids_ar, attn_mask_ar, decoder_label_ids, decoder_attn_mask, \
-               input_node_ids_ar, node_length_ar, adj_matrix_ar
-
-
-def evaluate_bleu(data_ref, data_sys):
-    coco_eval = run_coco_eval(data_ref, data_sys)
-    scores = {metric: score for metric, score in list(coco_eval.eval.items())}
-    return scores["Bleu_4"]
+        return input_ids_ar, attn_mask_ar, input_node_ids_ar, node_length_ar, adj_matrix_ar
