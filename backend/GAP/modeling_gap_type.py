@@ -158,16 +158,16 @@ class EncoderLayer(nn.Module):
         return x, attn_weights
 
 
-# Add graph-aware semantic aggregation module to BART encoder
+# Add structure-aware semantic aggregation module to BART encoder
 class GAPEncoderLayer(nn.Module):
-    def __init__(self, config: BartConfig):
+    def __init__(self, config: BartConfig, t_emb_size):
         super().__init__()
         self.embed_dim = config.d_model
         self.self_attn = SelfAttention(
             self.embed_dim, config.encoder_attention_heads, dropout=config.attention_dropout,
         )
         self.self_struc_attn = SelfGraphAttention(
-            self.embed_dim, config.encoder_attention_heads, dropout=config.attention_dropout,
+            self.embed_dim, config.encoder_attention_heads, dropout=config.attention_dropout, t_emb_size=t_emb_size
         )
         self.normalize_before = config.normalize_before
         self.self_attn_layer_norm = LayerNorm(self.embed_dim)
@@ -195,6 +195,7 @@ class GAPEncoderLayer(nn.Module):
         x_node = x_node.transpose(0, 1)  # node_size * batch * embed_dim
 
         node_len = adj_matrix.size(1)
+
         
         # structure-aware self-attention
         x_node, attn_weights_struct = self.self_struc_attn(
@@ -334,7 +335,7 @@ class GAPBartEncoder(nn.Module):
         config: BartConfig
     """
 
-    def __init__(self, config: BartConfig, embed_tokens):
+    def __init__(self, config: BartConfig, embed_tokens, t_emb_size):
         super().__init__()
 
         self.dropout = config.dropout
@@ -354,7 +355,7 @@ class GAPBartEncoder(nn.Module):
             self.embed_positions = LearnedPositionalEmbedding(
                 config.max_position_embeddings, embed_dim, self.padding_idx, config.extra_pos_embeddings,
             )
-        self.layers = nn.ModuleList([GAPEncoderLayer(config) for _ in range(config.encoder_layers)])
+        self.layers = nn.ModuleList([GAPEncoderLayer(config, t_emb_size) for _ in range(config.encoder_layers)])
         self.layernorm_embedding = LayerNorm(embed_dim) if config.normalize_embedding else nn.Identity()
         # mbart has one extra layer_norm
         self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None
@@ -382,7 +383,6 @@ class GAPBartEncoder(nn.Module):
 
         # get the attention mask for nodes
         node_attention_mask = convert_length_to_mask(node_length, input_node_ids.max()+1)
-#         edge_attention_mask = convert_length_to_mask(edge_length, input_edge_ids.max()+1)
 
         inputs_embeds = self.embed_tokens(input_ids) * self.embed_scale
         embed_pos = self.embed_positions(input_ids)
@@ -581,7 +581,6 @@ class BartDecoder(nn.Module):
         if use_cache:
             input_ids = input_ids[:, -1:]
             positions = positions[:, -1:]  # happens after we embed them
-            # assert input_ids.ne(self.padding_idx).any()
 
         x = self.embed_tokens(input_ids) * self.embed_scale
         x += positions
@@ -822,9 +821,11 @@ class SelfGraphAttention(nn.Module):
         dropout=0.0,
         bias=True,
         encoder_decoder_attention=False,  # otherwise self_attention
+        t_emb_size=0
     ):
         super().__init__()
         self.embed_dim = embed_dim
+        self.t_emb_size = t_emb_size
         self.num_heads = num_heads
         self.dropout = dropout
         self.head_dim = embed_dim // num_heads
@@ -835,6 +836,7 @@ class SelfGraphAttention(nn.Module):
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.t_emb_lookup = nn.Embedding(t_emb_size,1)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.cache_key = "encoder_decoder" if self.encoder_decoder_attention else "self"
         self.mh_attn = nn.MultiheadAttention(embed_dim, num_heads)
@@ -877,7 +879,6 @@ class SelfGraphAttention(nn.Module):
         else:
             k = self.k_proj(query)
             v = self.v_proj(query)
-       
         
         q = self._shape(q, tgt_len, bsz)  # (batch * head) * tgt_len * (embed_dim / head)
         if k is not None:
@@ -885,7 +886,7 @@ class SelfGraphAttention(nn.Module):
         if v is not None:
             v = self._shape(v, -1, bsz)  # (batch * head) * src_len * (embed_dim / head)
         
-
+      
 
         if saved_state is not None:
             k, v, key_padding_mask = self._use_saved_state(k, v, saved_state, key_padding_mask, static_kv, bsz)
@@ -904,39 +905,50 @@ class SelfGraphAttention(nn.Module):
         
         
         temp_k = k.unsqueeze(1).repeat(1,tgt_len,1,1)
-        #Each node is same on dim(1)
        
         attn_weights = torch.einsum('abc,abdc->abd', q, temp_k)
-        assert attn_weights.size() == (bsz * self.num_heads, tgt_len, src_len)
-    
-
+        assert attn_weights.size() == (bsz * self.num_heads, tgt_len, src_len)  
+        
+        #Type encoder
+        T = torch.zeros_like(attn_mask, dtype=torch.long)
+        for num in range(self.t_emb_size):
+            if num == 0:
+                attn_mask_bool = (attn_mask==60)
+                T.masked_fill_(attn_mask_bool,  num)
+            else:
+                attn_mask_bool = (attn_mask==num)
+                T.masked_fill_(attn_mask_bool,  num)
+        T = self.t_emb_lookup(T).squeeze(-1)
         if attn_mask is not None:
-            attn_mask_bool = (attn_mask==60)
             new_attn_mask = torch.zeros_like(attn_mask, dtype=torch.float)
+            
+            attn_mask_bool = (attn_mask==60)
             new_attn_mask.masked_fill_(attn_mask_bool,  -10000.0)
-            attn_mask = new_attn_mask
+            
+            
+
       
-        attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len) + attn_mask.unsqueeze(1)
+        attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len) + T.unsqueeze(1) + new_attn_mask.unsqueeze(1)
         attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
-       
+        
         # This is part of a workaround to get around fork/join parallelism not supporting Optional types.
         if key_padding_mask is not None and key_padding_mask.dim() == 0:
             key_padding_mask = None
         assert key_padding_mask is None or key_padding_mask.size()[:2] == (bsz, src_len,)
-            
-            
+
 
         attn_weights = F.softmax(attn_weights, dim=-1)
+      
         attn_probs = F.dropout(attn_weights, p=self.dropout, training=self.training,)
         assert v is not None
 
         attn_output = torch.bmm(attn_probs, v)
         assert attn_output.size() == (bsz * self.num_heads, tgt_len, self.head_dim)
 
+       
         attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn_output = self.out_proj(attn_output)
-
-        
+      
         if output_attentions:
             attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
         else:
@@ -1140,13 +1152,12 @@ class BartModel(PretrainedBartModel):
 
 # BART model with fully topological-aware module
 class GAPBartModel(PretrainedBartModel):
-    def __init__(self, config: BartConfig):
+    def __init__(self, config: BartConfig, t_emb_size):
         super().__init__(config)
 
         padding_idx, vocab_size = config.pad_token_id, config.vocab_size
         self.shared = nn.Embedding(vocab_size, config.d_model, padding_idx)
-
-        self.encoder = GAPBartEncoder(config, self.shared)
+        self.encoder = GAPBartEncoder(config, self.shared, t_emb_size)
         self.decoder = BartDecoder(config, self.shared)
 
         self.init_weights()
@@ -1433,12 +1444,23 @@ class SinusoidalPositionalEmbedding(nn.Embedding):
         return super().forward(positions)
 
 class GAPBartForConditionalGeneration(BartForConditionalGeneration):
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path, t_emb_dim, **kwargs):       
+        model = super().from_pretrained(pretrained_model_name_or_path, **kwargs)
+
+        model.init_type(t_emb_dim, model.config)
+        return model
+
     def __init__(self, config):
         super().__init__(config)
-        base_model = GAPBartModel(config)
+        self.config = config
+
+    def init_type(self, t_emb_dim, config):
+        self.t_emb_dim = t_emb_dim
+        base_model = GAPBartModel(config, t_emb_dim)
         self.model = base_model
         self.register_buffer("final_logits_bias", torch.zeros((1, self.model.shared.num_embeddings)))
-
+        
     def forward(self, input_ids, attention_mask=None, encoder_outputs=None,
             decoder_input_ids=None, decoder_attention_mask=None, input_node_ids=None, input_edge_ids=None,
             node_length=None, edge_length=None, adj_matrix=None, decoder_whole_ids=None, decoder_cached_states=None,

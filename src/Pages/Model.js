@@ -3,11 +3,15 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios'
 import TOC from '../Components/TOC'
+import jsonData from '../model_names.json'
+
 const Model = () =>{
     const [files, setFiles] = useState("");
     const [prediction, setPrediction] = useState(null);
+    const [model, setModel] = useState(null);
     const [fileindex,setfileindex]= useState(0);
     const [used,setUsed]= useState(false);
+    const models = jsonData.models 
     const fileRead = e => {
         e.preventDefault();
         var filereader=new FileReader();
@@ -20,7 +24,7 @@ const Model = () =>{
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
-        console.log(prediction)
+        setModel(e.target.value)
         setUsed(true)
     }
     const getPred = async e => {
@@ -28,7 +32,8 @@ const Model = () =>{
         console.log("Reached")
         axios.post("/predict",
         {
-            data:JSON.stringify(files[fileindex])
+            data:JSON.stringify(files[fileindex]),
+            model: model
         })
         .then(function (response) {
             setPrediction(response['data']['data']);
@@ -43,9 +48,11 @@ const Model = () =>{
             <div>
                 <Form.Select aria-label="Model chooser" onChange={modelSelect}>
                     {!used&&<option value="-1">Select Model</option>}
-                    <option value="1">Model 1</option>
-                    <option value="2">Model 2</option>
-                    <option value="3">Model 3</option>
+                    {models.map(model => (
+                      <option key={model.value} value={model.value}>
+                        {model.display}
+                      </option>
+                    ))}
                 </Form.Select>
                 <Form>
                     <Form.Group controlId="formFile" className="mb-3" onChange={fileRead}>
