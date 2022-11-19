@@ -195,7 +195,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     return(
         <form>
             <div>
-            <input type="name" value={node} placeholder="Event Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
+            <input type="name" value={name} placeholder="Event Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
             <button onClick={addTitle} className="submitButton" type="submit" > Add Event Name</button>
             </div>
             <div>

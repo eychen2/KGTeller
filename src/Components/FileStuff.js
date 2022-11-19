@@ -28,7 +28,38 @@ const FileStuff=({elements, edges, sentence, setfileindex, setFiles, cm, title, 
 
         }
         filestring=filestring.slice(0,-2)
-        filestring+="]"
+        filestring+="], "
+        filestring+="\"narration\": \""
+        const store = sentence.split(" ")
+        var cheese = ""
+        var entity=0
+        var index=0
+        console.log(cm)
+        while(index<colors.length)
+        {
+            if(colors[index]==='black')
+            {
+                
+                filestring+=store[index]+" "
+                ++index
+            }
+            else
+            {
+                const color = colors[index]
+                while(colors[index]===color)
+                {
+                    ++index
+                }
+                console.log(color)
+                cheese+="\"<entity_"+entity.toString()+">\": \""+cm.get(color)+"\", "
+                filestring+="<entity_"+entity.toString()+"> "
+                ++entity
+            }
+        }
+        filestring=filestring.slice(0,-1)
+        cheese=cheese.slice(0,-2)
+        filestring+="\", \"entity_ref_dict\": {"
+        filestring+=cheese+"}"
         filestring+="}]"
         download(filestring,"data.json","text/plain");
     }
