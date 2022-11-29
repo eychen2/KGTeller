@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import download from 'downloadjs';
 const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
@@ -32,7 +31,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
-            setElements([...elements, {id: node.toLowerCase(), data: {label: node},position:{x:0,y:400}, style:{color: colors[elements.length]}}].sort((a, b) => {
+            setElements([...elements, {id: node.toLowerCase(), data: {label: node},position:{x:-400,y:800}, style:{color: colors[elements.length]}}].sort((a, b) => {
                 return a.id.length - b.id.length;
             }));
             setcolormap(colormap.set(node.toLowerCase(),colors[elements.length]))
@@ -126,7 +125,10 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             index++;
         }
         realcolors.pop();
-        setcolors(realcolors);
+        if(temp2.length>2)
+        {
+            setcolors(realcolors);
+        }
         setsentence_holder('');
         },[elements,temp]);
     useEffect(()=> {
@@ -143,6 +145,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             for (const access in store) {
                 map1.set(access.toLowerCase(),store[access])
             }
+
             for (let [key, value] of map1) {
                 //do arrays instead of lists
                 var node = [{id: value, data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
@@ -153,7 +156,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 setcm(cm.set(colors[tempnodes.length-1],value))
                 i=i+1
             }
-            console.log(tempnodes)
             const tempedges=[];
             for (const access in current.keep_triples)
             {
@@ -181,15 +183,17 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             }))
             setEdges(tempedges)
             let text = current.narration
+            if(text.length>0&&map1.size>0)
+            {
             var re = new RegExp(Object.keys(store).join("|"),"gi");
             text = text.replace(re, function(matched){
                 return map1.get(matched.toLowerCase());
             });
-            setcolormap(tempcolor)
+            }
             settemp(text)
             setsentence(text)
+            setcolormap(tempcolor)
             setjson(JSON.stringify(current))
-            console.log(cm)
         }
     },[files,fileindex]);
     return(

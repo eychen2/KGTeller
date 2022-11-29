@@ -41,8 +41,9 @@ import ReactFlow, {
     const [sentence, setsentence] = useState('');
     const [colors, setcolors] = useState([])
     const [cm, setcm] = useState(new Map())
+    const [cmall, setcmall] = useState(new Map())
     const [json, setjson] = useState();
-    const [files, setFiles] = useState("");
+    const [files, setFiles] = useState([{Event_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
     return (
       <div className = "app">
@@ -70,7 +71,8 @@ import ReactFlow, {
         </div>
         <div align='center'>
           {files&&<h2>File Table of Contents</h2>}
-        {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
+        {files&&<TOC files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
+                              sentence = {sentence} title={title}  colors={colors} cmall={cmall} setcmall={setcmall}/>}
         {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
@@ -105,11 +107,12 @@ import ReactFlow, {
         </Row>
           <Row>
             <Col xs={10}>
-            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence} 
+            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence}
             setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} setTitle={setTitle} cm={cm} setcm={setcm}/>
             </Col>
             <Col>
-            <Changefileindex files={files} fileindex={fileindex} setfileindex={setfileindex}/>
+            <Changefileindex files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
+                              sentence = {sentence} title={title}  colors={colors} cmall={cmall} setcmall={setcmall}/>
             </Col>
           </Row>
            
