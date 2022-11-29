@@ -18,5 +18,5 @@ def predict():
     #Data processing
     processedData = format_data(data)
     if model is model:
-        GAP_predict_instance("Model_e_r_type_event",processedData)
+        formData = GAP_predict_instance("Model_e_r_type_event",processedData)
     return formData

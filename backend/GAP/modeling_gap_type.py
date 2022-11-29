@@ -131,6 +131,7 @@ class EncoderLayer(nn.Module):
                 `(batch, src_len)` where padding elements are indicated by ``1``.
             for t_tgt, t_src is excluded (or masked out), =0 means it is
             included in attention
+
         Returns:
             encoded output of shape `(seq_len, batch, embed_dim)`
         """
@@ -178,8 +179,7 @@ class GAPEncoderLayer(nn.Module):
         self.fc2 = nn.Linear(config.encoder_ffn_dim, self.embed_dim)
         self.final_layer_norm = LayerNorm(self.embed_dim)
 
-    def forward(self, x, encoder_padding_mask, output_attentions=False, input_node_ids=None, input_edge_ids=None, node_attention_mask=None, \
-                edge_attention_mask=None, adj_matrix=None):
+    def forward(self, x, encoder_padding_mask, output_attentions=False, input_node_ids=None, node_attention_mask=None, adj_matrix=None):
 
         residual = x
         if self.normalize_before:
@@ -232,6 +232,7 @@ class BartEncoder(nn.Module):
     """
     Transformer encoder consisting of *config.encoder_layers* self attention layers. Each layer
     is a :class:`EncoderLayer`.
+
     Args:
         config: BartConfig
     """
@@ -331,6 +332,7 @@ class GAPBartEncoder(nn.Module):
     """
     Transformer encoder consisting of *config.encoder_layers* self attention layers. Each layer
     is a :class:`EncoderLayer`.
+
     Args:
         config: BartConfig
     """
@@ -361,7 +363,7 @@ class GAPBartEncoder(nn.Module):
         self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None
 
     def forward(self, input_ids, attention_mask=None, output_attentions=False, output_hidden_states=False,
-                input_node_ids=None, input_edge_ids=None, node_length=None, edge_length=None, adj_matrix=None):
+                input_node_ids=None, node_length=None, adj_matrix=None):
         """
         Args:
             input_ids (LongTensor): tokens in the source language of shape
@@ -403,8 +405,8 @@ class GAPBartEncoder(nn.Module):
                 attn = None
             else:
                 x, attn = encoder_layer(x, attention_mask, output_attentions=output_attentions, \
-                                        input_node_ids=input_node_ids, input_edge_ids=input_edge_ids, \
-                                        node_attention_mask=node_attention_mask, edge_attention_mask=None, \
+                                        input_node_ids=input_node_ids, \
+                                        node_attention_mask=node_attention_mask, \
                                         adj_matrix=adj_matrix)
 
             if output_attentions:
@@ -558,6 +560,7 @@ class BartDecoder(nn.Module):
         """
         Includes several features from "Jointly Learning to Align and
         Translate with Transformer Models" (Garg et al., EMNLP 2019).
+
         Args:
             input_ids (LongTensor): previous decoder outputs of shape
                 `(batch, tgt_len)`, for teacher forcing
@@ -565,6 +568,7 @@ class BartDecoder(nn.Module):
                 encoder-side attention
             encoder_padding_mask: for ignoring pad tokens
             decoder_cached_states (dict or None): dictionary used for storing state during generation
+
         Returns:
             tuple:
                 - the decoder's features of shape `(batch, tgt_len, embed_dim)`
@@ -823,6 +827,7 @@ class SelfGraphAttention(nn.Module):
         encoder_decoder_attention=False,  # otherwise self_attention
         t_emb_size=0
     ):
+       
         super().__init__()
         self.embed_dim = embed_dim
         self.t_emb_size = t_emb_size
@@ -836,7 +841,7 @@ class SelfGraphAttention(nn.Module):
         self.k_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.t_emb_lookup = nn.Embedding(t_emb_size,1)
+        self.t_emb_lookup = nn.Embedding(self.t_emb_size,1)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.cache_key = "encoder_decoder" if self.encoder_decoder_attention else "self"
         self.mh_attn = nn.MultiheadAttention(embed_dim, num_heads)
@@ -911,9 +916,9 @@ class SelfGraphAttention(nn.Module):
         
         #Type encoder
         T = torch.zeros_like(attn_mask, dtype=torch.long)
+        attn_mask_bool = (attn_mask==60)
         for num in range(self.t_emb_size):
             if num == 0:
-                attn_mask_bool = (attn_mask==60)
                 T.masked_fill_(attn_mask_bool,  num)
             else:
                 attn_mask_bool = (attn_mask==num)
@@ -1152,12 +1157,12 @@ class BartModel(PretrainedBartModel):
 
 # BART model with fully topological-aware module
 class GAPBartModel(PretrainedBartModel):
-    def __init__(self, config: BartConfig, t_emb_size):
+    def __init__(self, config: BartConfig, t_emb_dim=0):
         super().__init__(config)
 
         padding_idx, vocab_size = config.pad_token_id, config.vocab_size
         self.shared = nn.Embedding(vocab_size, config.d_model, padding_idx)
-        self.encoder = GAPBartEncoder(config, self.shared, t_emb_size)
+        self.encoder = GAPBartEncoder(config, self.shared, t_emb_dim)
         self.decoder = BartDecoder(config, self.shared)
 
         self.init_weights()
@@ -1170,9 +1175,7 @@ class GAPBartModel(PretrainedBartModel):
         encoder_outputs: Optional[Tuple] = None,
         decoder_attention_mask=None,
         input_node_ids=None,
-        input_edge_ids=None,
         node_length=None,
-        edge_length=None,
         adj_matrix=None,
         decoder_cached_states=None,
         use_cache=None,
@@ -1210,9 +1213,7 @@ class GAPBartModel(PretrainedBartModel):
                 output_attentions=output_attentions,
                 output_hidden_states=output_hidden_states,
                 input_node_ids=input_node_ids,
-                input_edge_ids=input_edge_ids,
                 node_length=node_length,
-                edge_length=edge_length,
                 adj_matrix=adj_matrix,
             )
         assert isinstance(encoder_outputs, tuple)
@@ -1292,6 +1293,7 @@ class BartForConditionalGeneration(PretrainedBartModel):
             Tokens with indices set to ``-100`` are ignored (masked), the loss is only computed for the tokens
             with labels
             in ``[0, ..., config.vocab_size]``.
+
     Returns:
         :obj:`tuple(torch.FloatTensor)` comprising various elements depending on the configuration (:class:`~transformers.RobertaConfig`) and inputs:
         masked_lm_loss (`optional`, returned when ``labels`` is provided) ``torch.FloatTensor`` of shape ``(1,)``:
@@ -1301,23 +1303,30 @@ class BartForConditionalGeneration(PretrainedBartModel):
         hidden_states (:obj:`tuple(torch.FloatTensor)`, `optional`, returned when ``output_hidden_states=True`` is passed or when ``config.output_hidden_states=True``):
             Tuple of :obj:`torch.FloatTensor` (one for the output of the embeddings + one for the output of each layer)
             of shape :obj:`(batch_size, sequence_length, hidden_size)`.
+
             Hidden-states of the model at the output of each layer plus the initial embedding outputs.
         attentions (:obj:`tuple(torch.FloatTensor)`, `optional`, returned when ``output_attentions=True`` is passed or when ``config.output_attentions=True``):
             Tuple of :obj:`torch.FloatTensor` (one for each layer) of shape
             :obj:`(batch_size, num_heads, sequence_length, sequence_length)`.
+
             Attentions weights after the attention softmax, used to compute the weighted average in the self-attention
             heads.
+
     Conditional generation example::
+
             # Mask filling only works for bart-large
             from transformers import BartTokenizer, BartForConditionalGeneration
             tokenizer = BartTokenizer.from_pretrained('facebook/bart-large')
             TXT = "My friends are <mask> but they eat too many carbs."
+
             model = BartForConditionalGeneration.from_pretrained('facebook/bart-large')
             input_ids = tokenizer([TXT], return_tensors='pt')['input_ids']
             logits = model(input_ids)[0]
+
             masked_index = (input_ids[0] == tokenizer.mask_token_id).nonzero().item()
             probs = logits[0, masked_index].softmax(dim=0)
             values, predictions = probs.topk(5)
+
             tokenizer.decode(predictions).split()
             # ['good', 'great', 'all', 'really', 'very']
         """
@@ -1444,26 +1453,24 @@ class SinusoidalPositionalEmbedding(nn.Embedding):
         return super().forward(positions)
 
 class GAPBartForConditionalGeneration(BartForConditionalGeneration):
-    @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path, t_emb_dim, **kwargs):       
-        model = super().from_pretrained(pretrained_model_name_or_path, **kwargs)
-
-        model.init_type(t_emb_dim, model.config)
-        return model
-
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         super().__init__(config)
-        self.config = config
-
-    def init_type(self, t_emb_dim, config):
-        self.t_emb_dim = t_emb_dim
-        base_model = GAPBartModel(config, t_emb_dim)
+        base_model = GAPBartModel(config,**kwargs)
         self.model = base_model
         self.register_buffer("final_logits_bias", torch.zeros((1, self.model.shared.num_embeddings)))
         
+        
+
+#     def init_type(self, t_emb_dim, config):
+#         self.t_emb_dim = t_emb_dim
+# #         super().__init__(config)
+# #         base_model = GAPBartModel(config, t_emb_dim)
+# #         self.model = base_model
+# #         self.register_buffer("final_logits_bias", torch.zeros((1, self.model.shared.num_embeddings)))
+        
     def forward(self, input_ids, attention_mask=None, encoder_outputs=None,
-            decoder_input_ids=None, decoder_attention_mask=None, input_node_ids=None, input_edge_ids=None,
-            node_length=None, edge_length=None, adj_matrix=None, decoder_whole_ids=None, decoder_cached_states=None,
+            decoder_input_ids=None, decoder_attention_mask=None, input_node_ids=None,
+            node_length=None, adj_matrix=None, decoder_whole_ids=None, decoder_cached_states=None,
             use_cache=False, is_training=False):
 
         if is_training:
@@ -1478,9 +1485,7 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
             decoder_input_ids=_decoder_input_ids,
             decoder_attention_mask=decoder_attention_mask,
             input_node_ids=input_node_ids,
-            input_edge_ids=input_edge_ids,
             node_length=node_length,
-            edge_length=edge_length,
             adj_matrix=adj_matrix,
             decoder_cached_states=decoder_cached_states,
             use_cache=use_cache,
@@ -1515,77 +1520,106 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
             num_return_sequences: Optional[int] = None,
             attention_mask: Optional[torch.LongTensor] = None,
             input_node_ids=None,
-            input_edge_ids=None,
             node_length=None,
-            edge_length=None,
             adj_matrix=None,
             decoder_start_token_id: Optional[int] = None,
             use_cache: Optional[bool] = None,
             **model_specific_kwargs
     ) -> torch.LongTensor:
         r""" Generates sequences for models with a LM head. The method currently supports greedy decoding, beam-search decoding, sampling with temperature, sampling with top-k or nucleus sampling.
+
         Adapted in part from `Facebook's XLM beam search code`_.
+
         .. _`Facebook's XLM beam search code`:
            https://github.com/facebookresearch/XLM/blob/9e6f6814d17be4fe5b15f2e6c43eb2b2d76daeb4/src/model/transformer.py#L529
+
+
         Parameters:
+
             input_ids: (`optional`) `torch.LongTensor` of shape `(batch_size, sequence_length)`
                 The sequence used as a prompt for the generation. If `None` the method initializes
                 it as an empty `torch.LongTensor` of shape `(1,)`.
+
             max_length: (`optional`) int
                 The max length of the sequence to be generated.  Between `min_length` and infinity. Default to 20.
+
             min_length: (`optional`) int
                 The min length of the sequence to be generated.  Between 0 and infinity. Default to 0.
+
             do_sample: (`optional`) bool
                 If set to `False` greedy decoding is used. Otherwise sampling is used. Defaults to `False` as defined in `configuration_utils.PretrainedConfig`.
+
             early_stopping: (`optional`) bool
                 if set to `True` beam search is stopped when at least `num_beams` sentences finished per batch. Defaults to `False` as defined in `configuration_utils.PretrainedConfig`.
+
             num_beams: (`optional`) int
                 Number of beams for beam search. Must be between 1 and infinity. 1 means no beam search. Default to 1.
+
             temperature: (`optional`) float
                 The value used to module the next token probabilities. Must be strictly positive. Default to 1.0.
+
             top_k: (`optional`) int
                 The number of highest probability vocabulary tokens to keep for top-k-filtering. Between 1 and infinity. Default to 50.
+
             top_p: (`optional`) float
                 The cumulative probability of parameter highest probability vocabulary tokens to keep for nucleus sampling. Must be between 0 and 1. Default to 1.
+
             repetition_penalty: (`optional`) float
                 The parameter for repetition penalty. Between 1.0 and infinity. 1.0 means no penalty. Default to 1.0.
+
             pad_token_id: (`optional`) int
                 Padding token. Default to specicic model pad_token_id or None if it does not exist.
+
             bos_token_id: (`optional`) int
                 BOS token. Defaults to `bos_token_id` as defined in the models config.
+
             eos_token_id: (`optional`) int
                 EOS token. Defaults to `eos_token_id` as defined in the models config.
+
             length_penalty: (`optional`) float
                 Exponential penalty to the length. Default to 1.
+
             no_repeat_ngram_size: (`optional`) int
                 If set to int > 0, all ngrams of size `no_repeat_ngram_size` can only occur once.
             bad_words_ids: (`optional`) list of lists of int
                 `bad_words_ids` contains tokens that are not allowed to be generated. In order to get the tokens of the words that should not appear in the generated text, use `tokenizer.encode(bad_word, add_prefix_space=True)`.
+
             num_return_sequences: (`optional`) int
                 The number of independently computed returned sequences for each element in the batch. Default to 1.
+
             attention_mask (`optional`) obj: `torch.LongTensor` of same shape as `input_ids`
                 Mask to avoid performing attention on padding token indices.
                 Mask values selected in ``[0, 1]``:
                 ``1`` for tokens that are NOT MASKED, ``0`` for MASKED tokens.
                 Defaults to `None`.
+
                 `What are attention masks? <../glossary.html#attention-mask>`__
+
             decoder_start_token_id=None: (`optional`) int
                 Start token id for the decoder. Defaults to ``decoder_start_token_id`` as defined the model's config or to the ``bos_token_id``
                 if no ``decoder_start_token_id`` is found in the config.
                 This is only relevant for encoder-decoder models.
+
             use_cache: (`optional`) bool
                 If `use_cache` is True, past key values are used to speed up decoding if applicable to model. Defaults to `True`.
+
             model_specific_kwargs: (`optional`) dict
                 Additional model specific kwargs will be forwarded to the `forward` function of the model.
+
         Return:
+
             output: `torch.LongTensor` of shape `(batch_size * num_return_sequences, sequence_length)`
                 sequence_length is either equal to max_length or shorter if all batches finished early due to the `eos_token_id`
+
         Examples::
+
             from transformers import AutoTokenizer, AutoModelForCausalLM
-            tokenizer = AutoTokenizer.from_pretrained('distilgpt2')   # Initialize tokenizer
+
+            tokenizer = AutoTokenizer. ('distilgpt2')   # Initialize tokenizer
             model = AutoModelForCausalLM.from_pretrained('distilgpt2')    # Download model and configuration from S3 and cache.
             outputs = model.generate(max_length=40)  # do greedy decoding
             print('Generated: {}'.format(tokenizer.decode(outputs[0], skip_special_tokens=True)))
+
             tokenizer = AutoTokenizer.from_pretrained('openai-gpt')   # Initialize tokenizer
             model = AutoModelForCausalLM.from_pretrained('openai-gpt')    # Download model and configuration from S3 and cache.
             input_context = 'The dog'
@@ -1593,6 +1627,7 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
             outputs = model.generate(input_ids=input_ids, num_beams=5, num_return_sequences=3, temperature=1.5)  # generate 3 independent sequences using beam search decoding (5 beams) with sampling from initial context 'The dog'
             for i in range(3): #  3 output sequences were generated
                 print('Generated {}: {}'.format(i, tokenizer.decode(outputs[i], skip_special_tokens=True)))
+
             tokenizer = AutoTokenizer.from_pretrained('distilgpt2')   # Initialize tokenizer
             model = AutoModelForCausalLM.from_pretrained('distilgpt2')    # Download model and configuration from S3 and cache.
             input_context = 'The dog'
@@ -1600,12 +1635,14 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
             outputs = model.generate(input_ids=input_ids, max_length=40, temperature=0.7, num_return_sequences=3, do_sample=True)  # 3 generate sequences using by sampling
             for i in range(3): #  3 output sequences were generated
                 print('Generated {}: {}'.format(i, tokenizer.decode(outputs[i], skip_special_tokens=True)))
+
             tokenizer = AutoTokenizer.from_pretrained('ctrl')   # Initialize tokenizer
             model = AutoModelForCausalLM.from_pretrained('ctrl')    # Download model and configuration from S3 and cache.
             input_context = 'Legal My neighbor is'  # "Legal" is one of the control codes for ctrl
             input_ids = tokenizer.encode(input_context, return_tensors='pt')  # encode input context
             outputs = model.generate(input_ids=input_ids, max_length=50, temperature=0.7, repetition_penalty=1.2)  # generate sequences
             print('Generated: {}'.format(tokenizer.decode(outputs[0], skip_special_tokens=True)))
+
             tokenizer = AutoTokenizer.from_pretrained('gpt2')   # Initialize tokenizer
             model = AutoModelForCausalLM.from_pretrained('gpt2')    # Download model and configuration from S3 and cache.
             input_context = 'My cute dog'  # "Legal" is one of the control codes for ctrl
@@ -1754,8 +1791,7 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
 
             # add structural information when encoding
             encoder_outputs: tuple = encoder(input_ids, attention_mask=attention_mask, input_node_ids=input_node_ids,
-                                             input_edge_ids=input_edge_ids, node_length=node_length, edge_length=edge_length,
-                                             adj_matrix=adj_matrix)
+                                             node_length=node_length, adj_matrix=adj_matrix)
 
         # Expand input ids if num_beams > 1 or num_return_sequences > 1
         if num_return_sequences > 1 or num_beams > 1:
@@ -1850,3 +1886,4 @@ class GAPBartForConditionalGeneration(BartForConditionalGeneration):
             )
 
         return output
+

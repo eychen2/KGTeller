@@ -41,7 +41,6 @@ import ReactFlow, {
     const [sentence, setsentence] = useState('');
     const [colors, setcolors] = useState([])
     const [cm, setcm] = useState(new Map())
-    const [cmall, setcmall] = useState(new Map())
     const [json, setjson] = useState();
     const [files, setFiles] = useState([{Event_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
@@ -63,16 +62,21 @@ import ReactFlow, {
             In order to upload preexisting knowledge graphs, they must be in a json file in the form below
           </p>
           <p>
-          {'{'}"title": "title", "nodes":["node1","node2",...], "edges:"[ {'{'}"source": "sourcenodename" , "target": "targetnodename", "label" : "label"{'}'},...], "text: " "text" {'}'}
+          {'[{'}"Event_Name": "title", "keep_triples":[["source","label","target"]...], "narration": "text", "entity_ref_dict: {'{'}{"\"<entity_0>\": \"entity\""}...{'}]'}
+          </p> 
+          <p>
+          An example of this is below</p>
+          <p>
+          {"[{\"Event_Name\":\"Example\",\"keep_triples\":[[\"test\",\"edge\",\"entity\"],[\"test\",\"isa\",\"example\"]],\"narration\":\"This is a <entity_0> <entity_1> to see what an <entity_2> is\",\"entity_ref_dict\":{\"<entity_0>\":\"test\",\"<entity_1>\":\"example\",\"<entity_2>\":\"entity\"}}]"}
           </p>
           <p>
-            If you want to save your graph, you can save it in the above form by using the save file feature and use the knowledge graph later or as an input into the model.
+            If you want to save your graph, you can save it in the above form by using the save file feature and use the knowledge graph later or as an input into the model. This will be saved in the above format
          </p>
         </div>
         <div align='center'>
           {files&&<h2>File Table of Contents</h2>}
         {files&&<TOC files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
-                              sentence = {sentence} title={title}  colors={colors} cmall={cmall} setcmall={setcmall}/>}
+                              sentence = {sentence} title={title}  colors={colors}/>}
         {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
@@ -80,7 +84,7 @@ import ReactFlow, {
         </div>
        <Container>
         <Row>
-          <FileStuff elements={nodes} edges={edges} setEdges={setEdges} sentence={sentence} setfileindex={setfileindex} setFiles={setFiles} cm={cm} title={title} colors={colors}/>
+          <FileStuff elements={nodes} edges={edges} setEdges={setEdges} sentence={sentence} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} cm={cm} title={title} colors={colors}/>
         </Row>
         <Row style={{height:600}}>
           
@@ -112,7 +116,7 @@ import ReactFlow, {
             </Col>
             <Col>
             <Changefileindex files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
-                              sentence = {sentence} title={title}  colors={colors} cmall={cmall} setcmall={setcmall}/>
+                              sentence = {sentence} title={title}  colors={colors}/>
             </Col>
           </Row>
            

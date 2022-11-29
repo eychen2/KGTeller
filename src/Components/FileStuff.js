@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import download from 'downloadjs';
 import Form from 'react-bootstrap/Form';
-const FileStuff=({elements, edges, sentence, setfileindex, setFiles, cm, title, colors}) =>{
+const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, setFiles, cm, title, colors}) =>{
     const [filereader, setfilereader] = useState(new FileReader());
     const fileRead = e => {
         filereader.readAsText(e.target.files[0], "UTF-8");
@@ -13,7 +13,7 @@ const FileStuff=({elements, edges, sentence, setfileindex, setFiles, cm, title, 
         }; 
     },[filereader]);
     const saveFile = (e) =>{
-        //y
+        /*
         var filestring = "[{"
         filestring+="\"Event Name\": \""+title+"\","
         filestring+="\"keep_triples\": ["
@@ -60,8 +60,54 @@ const FileStuff=({elements, edges, sentence, setfileindex, setFiles, cm, title, 
         cheese=cheese.slice(0,-2)
         filestring+="\", \"entity_ref_dict\": {"
         filestring+=cheese+"}"
-        filestring+="}]"
+        filestring+="}]"*/
+        saveCurrent()
+        let filestring=JSON.stringify(files)
         download(filestring,"data.json","text/plain");
+    }
+    const saveCurrent = () =>{
+        console.log(files)
+        var temp=files[fileindex]
+        console.log(temp)
+        temp.Event_Name=title
+        var tempedges=[]
+        for (const x in edges)
+        {
+            const labels =edges[x].label.split(", ")
+            for(var i =0; i<labels.length;++i)
+            {
+                tempedges.push([edges[x].source,labels[i],edges[x].target])
+            }
+
+        }
+        temp.keep_triples=tempedges
+        const store = sentence.split(" ")
+        var entity=0
+        var index=0
+        var filestring=""
+        while(index<colors.length)
+        {
+            if(colors[index]==='black')
+            {
+                
+                filestring+=store[index]+" "
+                ++index
+            }   
+            else
+            {
+                const color = colors[index]
+                while(colors[index]===color)
+                {
+                    ++index
+                }
+                temp.entity_ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
+                filestring+="<entity_"+entity.toString()+"> "
+                ++entity
+            }
+        }
+        filestring=filestring.slice(0,-1)
+        temp.narration=filestring
+        files[fileindex]=temp
     }
     return(
         <div>

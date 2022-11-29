@@ -14,6 +14,23 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css'
+const getColor = (colors, index) => {
+    return colors[index];
+  }
+const ColorPara = (props, colors) => {
+    var i=0;
+    return (
+      <p>
+        {props.children.split(' ').map(text => {
+          return (
+            <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
+              {text} &nbsp;
+            </div>
+          )
+        })}
+      </p>
+    )
+  }
 const Model = () =>{
     const [files, setFiles] = useState("");
     const [prediction, setPrediction] = useState(null);
@@ -22,6 +39,10 @@ const Model = () =>{
     const [used,setUsed]= useState(false);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [colormap, setcolormap] = useState(new Map())
+    const [colors2, setcolors] = useState([])
+    let temp=""
+
     const models = jsonData.models
     const edgeTypes = {
         smart: SmartBezierEdge
@@ -42,8 +63,8 @@ const Model = () =>{
         if(current)
         {
             let map1 = new Map()
-            const tempnodes=[];
             let tempcolor= new Map()
+            const tempnodes=[];
             let y=4;
             let i=0
             let store =current.entity_ref_dict
@@ -85,8 +106,52 @@ const Model = () =>{
                 return a.id.length - b.id.length;
             }))
             setEdges(tempedges)
+            setcolormap(tempcolor)
+            console.log(tempcolor)
         }
     },[files,fileindex]);
+    const colorText = () =>{
+    var temp2 = (" "+temp+" ").toLowerCase();
+    var textcolors= Array(temp2.length).fill('black');
+        for(const x of nodes)
+        {
+            var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+        }
+        var realcolors = Array(temp.split(" ").length).fill('black');
+        var index=0;
+        var space=temp2.indexOf(" ",0);
+        while(space>=0)
+        {
+            realcolors[index]=textcolors[space];
+            space=temp2.indexOf(" ",space+1);
+            index++;
+        }
+        realcolors.pop();
+        setcolors(realcolors)
+    }
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
@@ -102,7 +167,10 @@ const Model = () =>{
             model: model
         })
         .then(function (response) {
-            setPrediction(response['data']['data']);
+            console.log(response)
+            temp=response['data']
+            setPrediction(response['data']);
+            colorText()
           })
     }
     return(
@@ -150,7 +218,7 @@ const Model = () =>{
                                 overflowY: 'auto',
                                 maxHeight:600
                                 }}>
-                                    <h2> The prediction is: {prediction}</h2>
+                                    <ColorPara colors={colors2}>{prediction}</ColorPara>
                     </Col>}
                     </Row>
                 </Container>

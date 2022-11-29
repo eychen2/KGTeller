@@ -9,7 +9,7 @@ from transformers import AdamW, get_linear_schedule_with_warmup
 from GAP.modeling_gap import GAPBartForConditionalGeneration as GAP_model
 from GAP.modeling_gap_type import GAPBartForConditionalGeneration as GAP_Type_model
 
-from GAP.data_relations_as_nodes import EventDataLoader, EventDataset
+from GAP.data_relations_as_nodes import GAPDataloader, EventDataset
 from GAP.data_relations_as_nodes import get_t_emb_dim
 import GAP.params
 
@@ -24,16 +24,16 @@ def GAP_predict_instance(model_name, data):
     #model
     if GAP.params.args['type_encoding']:
         t_emb_dim = get_t_emb_dim(GAP.params.args)
-        model = GAP_Type_model.from_pretrained(model_path,t_emb_dim)
+        model = GAP_Type_model.from_pretrained(model_path,t_emb_dim=t_emb_dim)
     else:
         model = GAP_model.from_pretrained(model_path)
         
     if torch.cuda.is_available():
         model.to(torch.device("cuda"))
         
-    #dataset    
+    #dataset
     dataset = EventDataset(GAP.params.args, data, tokenizer, "val")
-    dataloader = EventDataLoader(GAP.params.args, dataset, "val")
+    dataloader = GAPDataloader(GAP.params.args, dataset, "val")
     
     #prediction
     predictions = []
@@ -55,6 +55,6 @@ def GAP_predict_instance(model_name, data):
             pred = tokenizer.decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=GAP.params.args['clean_up_spaces'])
             predictions.append(pred.strip())
         print(predictions)
-    return predictions
+    return predictions[0]
     
     

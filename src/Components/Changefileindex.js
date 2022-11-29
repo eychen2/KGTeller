@@ -1,6 +1,6 @@
 import {Button} from 'react-bootstrap'
 import React, {useEffect, useState} from 'react';
-const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, sentence,title, colors,cmall, setcmall})=>{
+const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, sentence,title, colors})=>{
     const goPrevious= (e) =>{
         e.preventDefault()
         if(fileindex>0)
@@ -119,7 +119,6 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
                 ++entity
             }
         }
-        setcmall(cmall.set(title,cm))
         filestring=filestring.slice(0,-1)
         temp.narration=filestring
         console.log(temp)
