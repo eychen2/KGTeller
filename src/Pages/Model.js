@@ -13,34 +13,29 @@ import jsonData from '../model_names.json'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Task from '../Components/Task'
 import 'bootstrap/dist/css/bootstrap.min.css'
-const getColor = (colors, index) => {
-    return colors[index];
-  }
-const ColorPara = (props, colors) => {
-    var i=0;
-    return (
-      <p>
-        {props.children.split(' ').map(text => {
-          return (
-            <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
-              {text} &nbsp;
-            </div>
-          )
-        })}
-      </p>
-    )
-  }
+
 const Model = () =>{
     const [files, setFiles] = useState("");
-    const [prediction, setPrediction] = useState(null);
-    const [model, setModel] = useState(null);
+    const [prediction, setPrediction] = useState(null); 
+    const [model, setModel] = useState([]);
     const [fileindex,setfileindex]= useState(0);
-    const [used,setUsed]= useState(false);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [colormap, setcolormap] = useState(new Map())
     const [colors2, setcolors] = useState([])
+    const [listOfTasks, setTasks] = useState([
+        {
+          chore: "textA",
+          id: Math.floor(Math.random() * 1000000)
+        },
+        {
+          chore: "textB",
+          id: Math.floor(Math.random() * 1000000)
+        },
+        { chore: "textC", id: Math.floor(Math.random() * 1000000) }
+      ]);
     let temp=""
 
     const models = jsonData.models
@@ -56,7 +51,6 @@ const Model = () =>{
         filereader.onload = e => {
             setFiles(JSON.parse(e.target.result));
         }; 
-        setUsed(false)
     }
     useEffect(()=> {
         const current = files[fileindex]
@@ -155,8 +149,7 @@ const Model = () =>{
     const modelSelect = e => {
         e.preventDefault();
         console.log(e.target.value)
-        setModel(e.target.value)
-        setUsed(true)
+        setModel([].slice.call(e.target.selectedOptions).map(item => item.value))
     }
     const getPred = async e => {
         e.preventDefault()
@@ -173,6 +166,14 @@ const Model = () =>{
             colorText()
           })
     }
+    const handleChange = (e, index) => {
+        const value = e.target.value;
+        setTasks(state => [
+          ...state.slice(0, index),
+          { ...state[index], chore: value },
+          ...state.slice(index + 1)
+        ]);
+      }    
     return(
         <div className='app'>
             <div>
@@ -180,17 +181,19 @@ const Model = () =>{
                 <p>You can use this page to upload data and see what the model outputs</p> 
             </div>
             <div>
-                <Form.Select aria-label="Model chooser" onChange={modelSelect}>
-                    {!used&&<option value="-1">Select Model</option>}
+            <Form.Group as={Col} controlId="my_multiselect_field">
+                <Form.Label>Select which models you want to use. Use Ctrl and Click to select multiple</Form.Label>
+                <Form.Control as="select" multiple value={model} onChange={e => setModel([].slice.call(e.target.selectedOptions).map(item => item.value))}>
                     {models.map(model => (
                       <option key={model.value} value={model.value}>
                         {model.display}
                       </option>
                     ))}
-                </Form.Select>
+            </Form.Control>
+    </Form.Group>
                 <Form>
                     <Form.Group controlId="formFile" className="mb-3" onChange={fileRead}>
-                    <Form.Label>Default file input example</Form.Label>
+                    <Form.Label>Input a data file</Form.Label>
                     <Form.Control type="file" />
                     </Form.Group>
                 </Form>
@@ -214,12 +217,32 @@ const Model = () =>{
                     <Controls />
                     </ReactFlow>
                     </Col>
-                    {prediction&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
+                    {/*prediction&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
                                 overflowY: 'auto',
                                 maxHeight:600
                                 }}>
                                     <ColorPara colors={colors2}>{prediction}</ColorPara>
-                    </Col>}
+                            </Col>*/}
+                    <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
+                                maxHeight:600
+                                }}>
+                    {listOfTasks.map((ele, index) => {
+        return (
+            <div>
+            <h1>
+                Test title
+            </h1>
+          <Task
+          style={{ overflowY: 'auto',
+          maxHeight:150}}
+            colors={colors2}
+            chore={ele.chore}
+            onChange={e => handleChange(e, index)}
+          />
+            </div>
+        );
+      })}
+                    </Col>
                     </Row>
                 </Container>
             </div>
