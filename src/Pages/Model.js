@@ -37,7 +37,7 @@ const Model = () =>{
         { chore: "textC", id: Math.floor(Math.random() * 1000000) }
       ]);
     let temp=""
-
+    let colorstemp=["blue","green","red","orange"]
     const models = jsonData.models
     const edgeTypes = {
         smart: SmartBezierEdge
@@ -190,7 +190,7 @@ const Model = () =>{
                       </option>
                     ))}
             </Form.Control>
-    </Form.Group>
+            </Form.Group>
                 <Form>
                     <Form.Group controlId="formFile" className="mb-3" onChange={fileRead}>
                     <Form.Label>Input a data file</Form.Label>
@@ -235,7 +235,7 @@ const Model = () =>{
           <Task
           style={{ overflowY: 'auto',
           maxHeight:150}}
-            colors={colors2}
+            colors={colorstemp}
             chore={ele.chore}
             onChange={e => handleChange(e, index)}
           />

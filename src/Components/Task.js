@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import Changefileindex from "./Changefileindex";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 const getColor = (colors, index) => {
     return colors[index];
   }
 const ColorPara = (props, colors) => {
     var i=0;
     return (
-      <p>
+      <div style={{overflowY: 'auto',
+      maxHeight:150, width: 175}}>
         {props.children.split(' ').map(text => {
           return (
-            <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
+            <div style={{ color: getColor(props.colors, i++), display: 'inline'}}>
               {text} &nbsp;
             </div>
           )
         })}
-      </p>
+      </div>
     )
   }
 export default function Task({ chore, onChange, colors}) {
@@ -37,12 +39,19 @@ export default function Task({ chore, onChange, colors}) {
           autoFocus
           value={chore}
           onChange={onChange}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           type="text"
         />
       ) : (
-        <div onClick={handleClick} style={{ overflowY: 'auto',
-        maxHeight:150}}>{chore}</div>
+        <Row xs={1} md={2}>
+          <Col>
+          <ColorPara colors={colors}>{chore}</ColorPara>
+          </Col>
+          <Col>
+          <button onClick={handleClick}>Edit</button>
+          </Col>
+          
+        </Row>
       )}
     </>
   );
