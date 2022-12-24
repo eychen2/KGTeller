@@ -13,31 +13,20 @@ import jsonData from '../model_names.json'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Task from '../Components/Task'
+import Result from '../Components/Result'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 const Model = () =>{
     const [files, setFiles] = useState("");
-    const [prediction, setPrediction] = useState(null); 
-    const [model, setModel] = useState([]);
+    const [prediction, setPrediction] = useState(["test1","test2","test3"]); 
+    const [model, setModel] = useState(["BART", "JointGT", "GAP"]);
     const [fileindex,setfileindex]= useState(0);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [colormap, setcolormap] = useState(new Map())
     const [colors2, setcolors] = useState([])
-    const [listOfTasks, setTasks] = useState([
-        {
-          chore: "textA",
-          id: Math.floor(Math.random() * 1000000)
-        },
-        {
-          chore: "textB",
-          id: Math.floor(Math.random() * 1000000)
-        },
-        { chore: "textC", id: Math.floor(Math.random() * 1000000) }
-      ]);
-    let temp=""
     let colorstemp=["blue","green","red","orange"]
+    let temp=""
     const models = jsonData.models
     const edgeTypes = {
         smart: SmartBezierEdge
@@ -168,12 +157,15 @@ const Model = () =>{
     }
     const handleChange = (e, index) => {
         const value = e.target.value;
-        setTasks(state => [
-          ...state.slice(0, index),
-          { ...state[index], chore: value },
-          ...state.slice(index + 1)
-        ]);
-      }    
+        console.log(value)
+        console.log(index)
+        setPrediction((state) => [
+            ...state.slice(0, index),
+            value,
+            ...state.slice(index + 1)
+          ]);
+      }
+      console.log(prediction)
     return(
         <div className='app'>
             <div>
@@ -223,26 +215,26 @@ const Model = () =>{
                                 }}>
                                     <ColorPara colors={colors2}>{prediction}</ColorPara>
                             </Col>*/}
-                    <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
+                    {prediction&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
                                 maxHeight:600
                                 }}>
-                    {listOfTasks.map((ele, index) => {
+                    {prediction.map((ele, index) => {
         return (
             <div>
-            <h1>
-                Test title
-            </h1>
-          <Task
-          style={{ overflowY: 'auto',
-          maxHeight:150}}
+            <h4>
+                {model[index]}
+            </h4>
+          <Result
+            preds={ele}
+            index={index}
             colors={colorstemp}
-            chore={ele.chore}
             onChange={e => handleChange(e, index)}
+            setPreds={setPrediction}
           />
             </div>
         );
       })}
-                    </Col>
+                    </Col>}
                     </Row>
                 </Container>
             </div>

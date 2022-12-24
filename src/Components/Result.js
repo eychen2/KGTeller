@@ -19,15 +19,16 @@ const ColorPara = (props, colors) => {
       </div>
     )
   }
-export default function Task({ chore, onChange, colors}) {
+export default function Result({preds, index, onChange, colors, setPreds}) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleClick = () => {
     setIsEditing(true);
+    console.log(preds)
   };
 
   const handleKeyPress = e => {
-    if (e.key === "Enter"&&chore.length>0) {
+    if (e.key === "Enter"&&preds[index].length>0) {
       setIsEditing(false);
     }
   };
@@ -37,7 +38,7 @@ export default function Task({ chore, onChange, colors}) {
       {isEditing ? (
         <input
           autoFocus
-          value={chore}
+          value={preds}
           onChange={onChange}
           onKeyDown={handleKeyPress}
           type="text"
@@ -45,7 +46,7 @@ export default function Task({ chore, onChange, colors}) {
       ) : (
         <Row xs={1} md={2}>
           <Col>
-          <ColorPara colors={colors}>{chore}</ColorPara>
+          <ColorPara colors={colors}>{preds}</ColorPara>
           </Col>
           <Col>
           <button onClick={handleClick}>Edit</button>
