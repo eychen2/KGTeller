@@ -8,7 +8,7 @@ const ColorPara = (props, colors) => {
     var i=0;
     return (
       <div style={{overflowY: 'auto',
-      maxHeight:150, width: 300}}>
+      maxHeight:150, width: 210}}>
         {props.children.split(' ').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline'}}>
@@ -19,7 +19,7 @@ const ColorPara = (props, colors) => {
       </div>
     )
   }
-export default function Result({preds, index, onChange, colors, setPreds}) {
+export default function Result({preds, index, onChange, colors,updateFile}) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleClick = () => {
@@ -44,14 +44,16 @@ export default function Result({preds, index, onChange, colors, setPreds}) {
           type="text"
         />
       ) : (
-        <Row xs={1} md={2}>
-          <Col>
+        <Row >
+          <Col xs={7}>
           <ColorPara colors={colors}>{preds}</ColorPara>
           </Col>
-          <Col>
+          <Col xs={2}>
           <button onClick={handleClick}>Edit</button>
           </Col>
-          
+          <Col xs={1}>
+          <button onClick={updateFile} className="submitButton" type="submit" > Update</button>
+          </Col>
         </Row>
       )}
     </>
