@@ -26,7 +26,8 @@ const Model = () =>{
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [colormap, setcolormap] = useState(new Map())
-    const [colors2, setcolors] = useState([])
+    const [colors2, setcolors] = useState([[],[],[]])
+    const [cm, setcm] = useState(new Map())
     let colorstemp=["blue","green","red","orange"]
     let temp=""
     const models = jsonData.models
@@ -63,6 +64,7 @@ const Model = () =>{
                     y-=1;
                 tempnodes.push(node[0])
                 tempcolor.set(value,colors[tempnodes.length-1])
+                setcm(cm.set(colors[tempnodes.length-1],value))
                 i=i+1
             }
             const tempedges=[];
@@ -95,6 +97,53 @@ const Model = () =>{
             console.log(tempcolor)
         }
     },[files,fileindex]);
+    useEffect(()=> {
+    let colorstore=[]
+    for(const ele of prediction)
+    {
+    var temp2 = (" "+ele+" ").toLowerCase();
+    var textcolors= Array(temp2.length).fill('black');
+        for(const x of nodes)
+        {
+            var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
+            while(indexOccurence >= 0) 
+            {
+                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            }
+        }
+        var realcolors = Array(ele.split(" ").length).fill('black');
+        var index=0;
+        var space=temp2.indexOf(" ",0);
+        while(space>=0)
+        {
+            realcolors[index]=textcolors[space];
+            space=temp2.indexOf(" ",space+1);
+            index++;
+        }
+        realcolors.pop();
+        colorstore.push(realcolors)
+    }
+        setcolors(colorstore)
+    },[prediction]);
     const colorText = () =>{
     var temp2 = (" "+temp+" ").toLowerCase();
     var textcolors= Array(temp2.length).fill('black');
@@ -168,16 +217,18 @@ const Model = () =>{
           ]);
       }
       const updateFile = (e) =>{
-        e.preventDefault()
-        console.log(colors2)
+        e.preventDefault()        
         let newFile=files
-        let store=e.target.value.split(" ")
+        let store=prediction[e.target.value].split(" ")
         var entity=0
         var index=0
         var newText=""
-        while(index<colors2.length)
+        let tempcolors=colors2[e.target.value]
+        console.log(colormap)
+        const myMap = new Map()
+        while(index<tempcolors.length)
         {
-            if(colors2[index]==='black')
+            if(tempcolors[index]==='black')
             {
                 
                 newText+=store[index]+" "
@@ -185,14 +236,23 @@ const Model = () =>{
             }
             else
             {
-                const color = colors2[index]
-                while(colors2[index]===color)
+                const color = tempcolors[index]
+                while(tempcolors[index]===color)
                 {
                     ++index
                 }
-                temp.entity_ref_dict["<entity_"+entity.toString()+">"]= colormap.get(color)
+                if(myMap.has(color))
+                {
+                    newText+=myMap.get(color)+" "
+                }
+                else
+                {
+                myMap.set(color,"<entity_"+entity.toString()+">")
+                console.log("reached")
+                newFile[current].entity_ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+"> "
                 ++entity
+                }
             }
         }
         newText=newText.slice(0,-1)
@@ -262,7 +322,7 @@ const Model = () =>{
           <Result
             preds={ele}
             index={index}
-            colors={colors2}
+            colors={colors2[index]}
             onChange={e => handleChange(e, index)}
             updateFile={updateFile}
             setPreds={setPrediction}
