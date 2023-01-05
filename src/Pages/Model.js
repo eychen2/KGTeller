@@ -165,7 +165,9 @@ const Model = () =>{
             ...state.slice(index + 1)
           ]);
       }
-      console.log(prediction)
+      const updateFile = (e) =>{
+        
+       };
     return(
         <div className='app'>
             <div>
@@ -227,8 +229,9 @@ const Model = () =>{
           <Result
             preds={ele}
             index={index}
-            colors={colorstemp}
+            colors={colors2}
             onChange={e => handleChange(e, index)}
+            updateFile={updateFile}
             setPreds={setPrediction}
           />
             </div>
