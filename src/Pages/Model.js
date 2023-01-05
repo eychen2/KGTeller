@@ -15,12 +15,14 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Result from '../Components/Result'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import download from 'downloadjs';
 
 const Model = () =>{
     const [files, setFiles] = useState("");
     const [prediction, setPrediction] = useState(["test1","test2","test3"]); 
     const [model, setModel] = useState(["BART", "JointGT", "GAP"]);
     const [fileindex,setfileindex]= useState(0);
+    const [current,setCurrent]= useState(0);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [colormap, setcolormap] = useState(new Map())
@@ -142,7 +144,7 @@ const Model = () =>{
     }
     const getPred = async e => {
         e.preventDefault()
-        console.log("Reached")
+        setCurrent(fileindex)
         axios.post("/predict",
         {
             data:JSON.stringify(files[fileindex]),
@@ -166,7 +168,38 @@ const Model = () =>{
           ]);
       }
       const updateFile = (e) =>{
-        
+        e.preventDefault()
+        console.log(colors2)
+        let newFile=files
+        let store=e.target.value.split(" ")
+        var entity=0
+        var index=0
+        var newText=""
+        while(index<colors2.length)
+        {
+            if(colors2[index]==='black')
+            {
+                
+                newText+=store[index]+" "
+                ++index
+            }
+            else
+            {
+                const color = colors2[index]
+                while(colors2[index]===color)
+                {
+                    ++index
+                }
+                temp.entity_ref_dict["<entity_"+entity.toString()+">"]= colormap.get(color)
+                newText+="<entity_"+entity.toString()+"> "
+                ++entity
+            }
+        }
+        newText=newText.slice(0,-1)
+        newFile[current].narration=newText
+        setFiles(newFile)
+        let filestring=JSON.stringify(newFile)
+        download(filestring,"data.json","text/plain");
        };
     return(
         <div className='app'>

@@ -52,7 +52,7 @@ export default function Result({preds, index, onChange, colors,updateFile}) {
           <button onClick={handleClick}>Edit</button>
           </Col>
           <Col xs={1}>
-          <button onClick={updateFile} className="submitButton" type="submit" > Update</button>
+          <button onClick={updateFile} value = {preds} className="submitButton" type="submit" > Update</button>
           </Col>
         </Row>
       )}
