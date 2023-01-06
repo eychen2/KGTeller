@@ -27,8 +27,8 @@ class EventDataLoader(DataLoader):
                                                num_workers=args.num_workers)
 
 class EventDataset(Dataset):
-    def __init__(self, logger, args, data_path, tokenizer, mode):
-        self.data_path = data_path
+    def __init__(self, args, data, tokenizer, mode):
+        self.data = data
         self.tokenizer = tokenizer
                 
         print("Total samples = {}".format(len(self.data)))
@@ -148,7 +148,7 @@ class EventDataset(Dataset):
 
     def __getitem__(self, idx):
 
-        entry = self.data[idx]
+        kg = self.data[idx]
         
         kg_list = []
         triple_list = kg.split('<S>')

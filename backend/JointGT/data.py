@@ -27,24 +27,13 @@ class EventDataLoader(DataLoader):
                                                num_workers=args.num_workers)
 
 class EventDataset(Dataset):
-    def __init__(self, logger, args, data_path, tokenizer, mode):
-        self.data_path = data_path
+    def __init__(self, args, data, tokenizer, mode):
+        self.data = data
         self.tokenizer = tokenizer
-        with open(self.data_path+ '.source') as f:
-            source_kgs = [sample.rstrip('\n') for sample in f]
-       
-        with open(self.data_path+ '.target.tok') as f:
-            target_texts = [sample.rstrip('\n') for sample in f]
-        
-        self.data = list(zip(source_kgs, target_texts))
         
         print("Total samples = {}".format(len(self.data)))
 
-        if args.debug:
-            self.data = self.data[:1000]
         assert type(self.data) == list
-       
-
         self.args = args
         self.data_type = mode
         self.metric = "BLEU"
@@ -181,8 +170,7 @@ class EventDataset(Dataset):
 
     def __getitem__(self, idx):
 
-        entry = self.data[idx]
-        kg = entry[0]
+        kg = self.data[idx]
         
         kg_list = []
         triple_list = kg.split('<S>')
