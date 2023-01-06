@@ -24,7 +24,7 @@ def normalize_relations(relation):
     relation = relation.replace('_', ' ')
     return relation
 
-def format_data(dataset):
+def format_data_BART(dataset):
     if type(dataset) is not list:
         dataset = [dataset]
     triples_data_bart = []

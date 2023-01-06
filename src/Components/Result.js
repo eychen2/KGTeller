@@ -54,7 +54,8 @@ export default function Result({preds, index, onChange, colors,updateFile}) {
           <Col xs={1}>
           <button onClick={updateFile} value = {index} className="submitButton" type="submit" > Update</button>
           </Col>
-        </Row>
+          <hr class="mb-24"/>
+	</Row>
       )}
     </>
   );

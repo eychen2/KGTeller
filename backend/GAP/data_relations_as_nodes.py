@@ -40,12 +40,6 @@ class GAPDataloader(DataLoader):
         super(GAPDataloader, self).__init__(dataset, sampler=sampler, batch_size=batch_size,
                                                num_workers=args['num_workers'])
 
-        
-        
-        
-        
-        
-        
 # Downstream dataset
 class WebNLGDataset(Dataset):
     def __init__(self, args, data_path, tokenizer, mode):
