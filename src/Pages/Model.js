@@ -28,6 +28,7 @@ const Model = () =>{
     const [colormap, setcolormap] = useState(new Map())
     const [colors2, setcolors] = useState([[],[],[]])
     const [cm, setcm] = useState(new Map())
+    const [filename, setfilename] = useState("")
     let colorstemp=["blue","green","red","orange"]
     let temp=""
     const models = jsonData.models
@@ -224,8 +225,8 @@ const Model = () =>{
         var index=0
         var newText=""
         let tempcolors=colors2[e.target.value]
-        console.log(colormap)
         const myMap = new Map()
+        console.log(store)
         while(index<tempcolors.length)
         {
             if(tempcolors[index]==='black')
@@ -237,20 +238,32 @@ const Model = () =>{
             else
             {
                 const color = tempcolors[index]
-                while(tempcolors[index]===color)
+                if(cm.get(color).indexOf(' ') >= 0)
+                {
+                    while(tempcolors[index]===color)
+                    {
+                        ++index
+                    }
+                }
+                else
                 {
                     ++index
                 }
                 if(myMap.has(color))
                 {
-                    newText+=myMap.get(color)+" "
+                    newText+=myMap.get(color)
+                    if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
+                        newText+=store[index-1].slice(-1)
+                    newText+=" "
                 }
                 else
                 {
                 myMap.set(color,"<entity_"+entity.toString()+">")
-                console.log("reached")
                 newFile[current].entity_ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
-                newText+="<entity_"+entity.toString()+"> "
+                newText+="<entity_"+entity.toString()+">"
+                if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
+                    newText+=store[index-1].slice(-1)
+                newText+=" "
                 ++entity
                 }
             }
@@ -258,9 +271,14 @@ const Model = () =>{
         newText=newText.slice(0,-1)
         newFile[current].narration=newText
         setFiles(newFile)
-        let filestring=JSON.stringify(newFile)
-        download(filestring,"data.json","text/plain");
+        console.log(newText)
+        setfilename("data"+model[e.target.value]+".json")
        };
+    const saveFile = (e) =>{
+        e.preventDefault()
+        let filestring=JSON.stringify(files)
+        download(filestring,filename,"text/plain");
+    }
     return(
         <div className='app'>
             <div>
@@ -286,9 +304,19 @@ const Model = () =>{
                 </Form>
                 {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
                 <Form>
-                    <Button variant="primary" type="submit" onClick={getPred}>
-                     Predict
-                    </Button>
+                    <Row>
+                        <Col>
+                        <Button variant="primary" type="submit" onClick={getPred}>
+                        Predict
+                        </Button>
+                        </Col>
+                        <Col xs={2}>
+                        <Button variant="primary" type="submit" onClick={saveFile}>
+                        Save
+                        </Button>
+                        </Col>
+                        
+                    </Row>
                 </Form>
                 <Container>
                     <Row style={{height:600}}>
