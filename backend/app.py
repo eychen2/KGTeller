@@ -14,29 +14,25 @@ app = Flask(__name__)
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    #load model
-    #model=load_model()
+    formData = None
     response=request.get_json()
     data = response['data']
-    model = response['model']
     
     
-    
-# #     todo: uncomment this to list
-#     processedData = format_data_BART(data)
-#     models = response['models']
-#     formDataDict = dict()
-#     for model in models:
-#         if model is "BART":
-#             formDataDict[model] = BART_predict_instance(model,processedData)
-#         elif model is "JointGT":
-#             formDataDict[model] = JointGT_predict_instance(model,processedData)
-#         else:
-#             formDataDict[model] = GAP_predict_instance(model,processedData)
+    processedData = format_data_BART(data)
+    models = response['model']
+    formDataList = []
+    print(models)
+    for model in models:
+        if model == "BART":
+            formDataList.append(BART_predict_instance(model,processedData))
+        elif model == "JointGT": 
+            formDataList.append(JointGT_predict_instance(model,processedData))
+        elif model == "GAP w/ Type":
+            formDataList.append(GAP_predict_instance(model.split()[0],processedData, True))
+        else:
+            formDataList.append(GAP_predict_instance(model,processedData))
             
-   
-    #Data processing
-    processedData = format_data(data)
-    if model is model:
-        formData = GAP_predict_instance("Model_e_r_type_event",processedData)
-    return formData
+    print("outputs: ")
+    print(formDataList)
+    return formDataList

@@ -1,12 +1,12 @@
 {
   "models": [
-    { "value": "GraphWriter",
-      "display": "GraphWriter" },
     { "value": "BART",
       "display": "BART" },
     { "value": "JointGT",
       "display": "JointGT" },
     { "value": "GAP",
-      "display": "GAP" }
+      "display": "GAP" },
+    { "value": "GAP w/ Type",
+      "display": "GAP w/ Type" }
   ]
 }

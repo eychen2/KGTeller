@@ -13,7 +13,7 @@ from GAP.data_relations_as_nodes import GAPDataloader, EventDataset
 from GAP.data_relations_as_nodes import get_t_emb_dim
 import GAP.params
 
-def GAP_predict_instance(model_name, data):
+def GAP_predict_instance(model_name, data, type_encoding=None):
     #load model/tokenizer here
     model_path = GAP.params.args['model_path']+model_name
     tokenizer_path = GAP.params.args['tokenizer_path']
@@ -22,7 +22,7 @@ def GAP_predict_instance(model_name, data):
     tokenizer = BartTokenizer.from_pretrained(tokenizer_path)
     
     #model
-    if GAP.params.args['type_encoding']:
+    if type_encoding:
         t_emb_dim = get_t_emb_dim(GAP.params.args)
         model = GAP_Type_model.from_pretrained(model_path,t_emb_dim=t_emb_dim)
     else:
@@ -54,7 +54,6 @@ def GAP_predict_instance(model_name, data):
         for output in outputs:
             pred = tokenizer.decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=GAP.params.args['clean_up_spaces'])
             predictions.append(pred.strip())
-        print(predictions)
     return predictions[0]
     
     

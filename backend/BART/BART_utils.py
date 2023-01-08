@@ -6,7 +6,7 @@ import random
 from transformers import BartTokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from BART.modeling_bart import BartForConditionalGeneration as BartModel
+from BART.modeling_bart import BartForConditionalGeneration as Bart
 
 from BART.data import EventDataLoader, EventDataset
 import BART.params
@@ -20,7 +20,7 @@ def BART_predict_instance(model_name, data):
     tokenizer = BartTokenizer.from_pretrained(tokenizer_path)
     
     #model
-    model = BartModel.from_pretrained(model_path)
+    model = Bart.from_pretrained(model_path)
         
     if torch.cuda.is_available():
         model.to(torch.device("cuda"))
@@ -28,7 +28,7 @@ def BART_predict_instance(model_name, data):
     #dataset
     dataset = EventDataset(BART.params.args, data, tokenizer, "val")
     dataloader = EventDataLoader(BART.params.args, dataset, "val")
-    
+
     #prediction
     predictions = []
     for i, batch in enumerate(dataloader):

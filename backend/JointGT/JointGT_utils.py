@@ -6,7 +6,7 @@ import random
 from transformers import BartTokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from JointGT.modeling_joint import MyBartForConditionalGeneration as MyBart
+from JointGT.modeling_jointgt import MyBartForConditionalGeneration as MyBart
 
 from JointGT.data import EventDataLoader, EventDataset
 import JointGT.params
@@ -36,11 +36,11 @@ def JointGT_predict_instance(model_name, data):
             batch = [b.to(torch.device("cuda")) for b in batch]     
         outputs = model.generate(input_ids=batch[0],
                                  attention_mask=batch[1],
-                                 input_node_ids=batch[4],
-                                 input_edge_ids=batch[5],
-                                 node_length=batch[6],
-                                 edge_length=batch[7],
-                                 adj_matrix=batch[8],
+                                 input_node_ids=batch[2],
+                                 input_edge_ids=batch[3],
+                                 node_length=batch[4],
+                                 edge_length=batch[5],
+                                 adj_matrix=batch[6],
                                  num_beams=JointGT.params.args['num_beams'],
                                  length_penalty=JointGT.params.args['length_penalty'],
                                  max_length=JointGT.params.args['max_output_length'],
@@ -50,5 +50,4 @@ def JointGT_predict_instance(model_name, data):
         for output in outputs:
             pred = tokenizer.decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=JointGT.params.args['clean_up_spaces'])
             predictions.append(pred.strip())
-        print(predictions)
     return predictions[0]
