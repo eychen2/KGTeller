@@ -204,7 +204,7 @@ const Model = () =>{
             console.log(response)
             temp=response['data']
             setPrediction(response['data']);
-            colorText()
+            // colorText()
           })
     }
     const handleChange = (e, index) => {
