@@ -1,6 +1,6 @@
 import os
 import numpy as numpy
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 from GAP.GAP_utils import GAP_predict_instance
@@ -28,11 +28,11 @@ def predict():
             formDataList.append(BART_predict_instance(model,processedData))
         elif model == "JointGT": 
             formDataList.append(JointGT_predict_instance(model,processedData))
-        elif model == "GAP w/ Type":
-            formDataList.append(GAP_predict_instance(model.split()[0],processedData, True))
-        else:
+        elif model == "GAP":
             formDataList.append(GAP_predict_instance(model,processedData))
+        else:
+            formDataList.append(GAP_predict_instance(model.split()[0],processedData, True))
             
     print("outputs: ")
     print(formDataList)
-    return formDataList
+    return jsonify(formDataList)
