@@ -226,7 +226,8 @@ const Model = () =>{
         var newText=""
         let tempcolors=colors2[e.target.value]
         const myMap = new Map()
-        console.log(store)
+        const mySet= new Set()
+        let ref_dict={}
         while(index<tempcolors.length)
         {
             if(tempcolors[index]==='black')
@@ -259,7 +260,8 @@ const Model = () =>{
                 else
                 {
                 myMap.set(color,"<entity_"+entity.toString()+">")
-                newFile[current].entity_ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
+                mySet.add(cm.get(color))
+                ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
                 if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
                     newText+=store[index-1].slice(-1)
@@ -268,6 +270,19 @@ const Model = () =>{
                 }
             }
         }
+        console.log(newFile[current].entity_ref_dict)
+        let old_ref_dict=newFile[current].entity_ref_dict
+        console.log(mySet)
+        console.log(old_ref_dict)
+        for(var key in old_ref_dict)
+        {
+            if(!mySet.has(old_ref_dict[key]))
+                {
+                    ref_dict["<entity_"+entity.toString()+">"]= old_ref_dict[key]
+                    ++entity
+                }
+        }
+        newFile[current].entity_ref_dict=ref_dict
         newText=newText.slice(0,-1)
         newFile[current].narration=newText
         setFiles(newFile)
@@ -277,6 +292,7 @@ const Model = () =>{
     const saveFile = (e) =>{
         e.preventDefault()
         let filestring=JSON.stringify(files)
+        console.log(files[current])
         download(filestring,filename,"text/plain");
     }
     return(
