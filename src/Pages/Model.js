@@ -19,8 +19,9 @@ import download from 'downloadjs';
 
 const Model = () =>{
     const [files, setFiles] = useState("");
-    const [prediction, setPrediction] = useState(["test1","test2","test3"]); 
-    const [model, setModel] = useState(["BART", "JointGT", "GAP"]);
+    const [prediction, setPrediction] = useState([]); 
+    const [model, setModel] = useState([]);
+    const [currModel, setCurrModel] = useState([]);
     const [fileindex,setfileindex]= useState(0);
     const [current,setCurrent]= useState(0);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -29,8 +30,7 @@ const Model = () =>{
     const [colors2, setcolors] = useState([[],[],[]])
     const [cm, setcm] = useState(new Map())
     const [filename, setfilename] = useState("")
-    let colorstemp=["blue","green","red","orange"]
-    let temp=""
+    let temp=[]
     const models = jsonData.models
     const edgeTypes = {
         smart: SmartBezierEdge
@@ -146,46 +146,51 @@ const Model = () =>{
         setcolors(colorstore)
     },[prediction]);
     const colorText = () =>{
-    var temp2 = (" "+temp+" ").toLowerCase();
-    var textcolors= Array(temp2.length).fill('black');
-        for(const x of nodes)
+        let colorstore=[]
+        for(const ele of temp)
         {
-            var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
-            while(indexOccurence >= 0) 
+        var temp2 = (" "+ele+" ").toLowerCase();
+        var textcolors= Array(temp2.length).fill('black');
+            for(const x of nodes)
             {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
+                while(indexOccurence >= 0) 
+                {
+                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                }
+                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
+                while(indexOccurence >= 0) 
+                {
+                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                }
+                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
+                while(indexOccurence >= 0) 
+                {
+                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                }
+                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
+                while(indexOccurence >= 0) 
+                {
+                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                }
             }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
-            while(indexOccurence >= 0) 
+            var realcolors = Array(ele.split(" ").length).fill('black');
+            var index=0;
+            var space=temp2.indexOf(" ",0);
+            while(space>=0)
             {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                realcolors[index]=textcolors[space];
+                space=temp2.indexOf(" ",space+1);
+                index++;
             }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
+            realcolors.pop();
+            colorstore.push(realcolors)
         }
-        var realcolors = Array(temp.split(" ").length).fill('black');
-        var index=0;
-        var space=temp2.indexOf(" ",0);
-        while(space>=0)
-        {
-            realcolors[index]=textcolors[space];
-            space=temp2.indexOf(" ",space+1);
-            index++;
-        }
-        realcolors.pop();
-        setcolors(realcolors)
+            setcolors(colorstore)
     }
     const modelSelect = e => {
         e.preventDefault();
@@ -195,6 +200,7 @@ const Model = () =>{
     const getPred = async e => {
         e.preventDefault()
         setCurrent(fileindex)
+        setCurrModel(model)
         axios.post("/predict",
         {
             data:JSON.stringify(files[fileindex]),
@@ -203,8 +209,8 @@ const Model = () =>{
         .then(function (response) {
             console.log(response)
             temp=response['data']
-            setPrediction(response['data']);
-            // colorText()
+            setPrediction(temp);
+            colorText()
           })
     }
     const handleChange = (e, index) => {
@@ -361,7 +367,7 @@ const Model = () =>{
         return (
             <div>
             <h4>
-                {model[index]}
+                {currModel[index]}
             </h4>
           <Result
             preds={ele}
