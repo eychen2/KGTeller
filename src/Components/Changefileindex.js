@@ -1,6 +1,6 @@
 import {Button} from 'react-bootstrap'
 import React, {useEffect, useState} from 'react';
-const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, sentence,title, colors})=>{
+const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, sentence,title, colors, elements})=>{
     const goPrevious= (e) =>{
         e.preventDefault()
         if(fileindex>0)
@@ -80,10 +80,8 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         console.log(temp)
     },[clicked])*/
     const saveCurrent = () =>{
-        console.log(files)
-        var temp=files[fileindex]
-        console.log(temp)
-        temp.Event_Name=title
+        let temp = files
+        temp[fileindex].Event_Name=title
         var tempedges=[]
         for (const x in edges)
         {
@@ -94,35 +92,69 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
             }
 
         }
-        temp.keep_triples=tempedges
+        temp[fileindex].keep_triples=tempedges
         const store = sentence.split(" ")
         var entity=0
         var index=0
-        var filestring=""
+        var newText=""
+        let ref_dict={}
+        const myMap = new Map()
+        const mySet= new Set()
         while(index<colors.length)
         {
             if(colors[index]==='black')
             {
                 
-                filestring+=store[index]+" "
+                newText+=store[index]+" "
                 ++index
-            }
+            }   
             else
             {
                 const color = colors[index]
-                while(colors[index]===color)
+                if(cm.get(color).indexOf(' ') >= 0)
+                {
+                    while(colors[index]===color)
+                    {
+                        ++index
+                    }
+                }
+                else
                 {
                     ++index
                 }
-                temp.entity_ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
-                filestring+="<entity_"+entity.toString()+"> "
+                if(myMap.has(color))
+                {
+                    newText+=myMap.get(color)
+                    if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
+                        newText+=store[index-1].slice(-1)
+                    newText+=" "
+                }
+                else
+                {
+                myMap.set(color,"<entity_"+entity.toString()+">")
+                mySet.add(cm.get(color))
+                ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
+                newText+="<entity_"+entity.toString()+">"
+                if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
+                    newText+=store[index-1].slice(-1)
+                newText+=" "
                 ++entity
+                }
             }
         }
-        filestring=filestring.slice(0,-1)
-        temp.narration=filestring
+        for(const x of elements)
+        {
+            if(!mySet.has(x.id))
+                {
+                    ref_dict["<entity_"+entity.toString()+">"]= x.id
+                    ++entity
+                }
+        }
+        newText=newText.slice(0,-1)
+        temp[fileindex].entity_ref_dict=ref_dict
+        temp[fileindex].narration=newText
+        setFiles(temp)
         console.log(temp)
-        files[fileindex]=temp
     }
     return(
         <form>
