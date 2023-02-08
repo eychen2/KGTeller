@@ -6,20 +6,16 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         if(fileindex>0)
         {
             saveCurrent()
-            setFiles(files)
             setfileindex(fileindex-1);
         }
     };
     const goNext= (e) =>{
         e.preventDefault()
-        console.log(files.length)
         if(fileindex<files.length-1)
         {
             saveCurrent()
-            setFiles(files)
             setfileindex(fileindex+1);
         }
-        console.log(fileindex)
 
     };
     const addNew= (e) =>{
@@ -81,8 +77,10 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
     },[clicked])*/
     const saveCurrent = () =>{
         let temp = files
+        console.log(temp)
         temp[fileindex].Event_Name=title
         var tempedges=[]
+        //console.log(fileindex)
         for (const x in edges)
         {
             const labels =edges[x].label.split(", ")
@@ -94,6 +92,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         }
         temp[fileindex].keep_triples=tempedges
         const store = sentence.split(" ")
+        //console.log(store)
         var entity=0
         var index=0
         var newText=""
@@ -122,7 +121,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
                 {
                     ++index
                 }
-                if(myMap.has(color))
+                if(myMap.has(color)&&store[0]!=='')
                 {
                     newText+=myMap.get(color)
                     if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
@@ -135,7 +134,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
                 mySet.add(cm.get(color))
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
-                if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
+                if(store[0]!==''&&'.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
                     newText+=store[index-1].slice(-1)
                 newText+=" "
                 ++entity
@@ -154,7 +153,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         temp[fileindex].entity_ref_dict=ref_dict
         temp[fileindex].narration=newText
         setFiles(temp)
-        console.log(temp)
+        //console.log(temp)
     }
     return(
         <form>

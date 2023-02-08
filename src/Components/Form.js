@@ -9,17 +9,30 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
     const [edge,setEdge] = useState({source:'', target:'', label:''})
-    const colors = ['limegreen','antiquewhite','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
+    const colors = ['limegreen','purple','indianred','darksalmon','red','darkred','pink','hotpink','deeppink','mediumvioletred','tomato','orangered','darkorange','orange','aqua','aquamarine','blue','chocolate','blueviolet','cadetblue','burlywood','chartreuse','cyan','darkcyan','darkblue','darkgoldenrod','darkgrey','darkkhaki','darkslategrey','forestgreen','ivory','lemonchiffon','lime','mediumslateblue','mistyrose','peru','rebeccapurple','rosybrown','seashell','steelblue','tan','teal','thistle','wheat','yellow','silver','blanchedalmond','cornsilk','grey','indigo'];
     const Reset = (e) => {
         setElements([]);
         setEdges([]);
         settemp("");
         setsentence_holder("");
-        setcolormap(colormap.clear());
-        setcm(cm.clear())
+        colormap.clear()
+        setcolormap(colormap);
+        cm.clear()
+        setcm(cm)
         setcolors([]);
         setFiles("");
         setfileindex(0);
+      }
+      const Reset2 = (e) => {
+        setElements([]);
+        setEdges([]);
+        settemp("");
+        setsentence_holder("");
+        colormap.clear()
+        setcolormap(colormap);
+        cm.clear()
+        setcm(cm)
+        setcolors([]);
       }
     const addTitle = (e) =>{
         e.preventDefault()
@@ -28,6 +41,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     }
     const addNode = (e) => {
         e.preventDefault();
+        console.log(files)
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
@@ -44,6 +58,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setEdge({source: {source}, target: {target},label:{label} })
     };
     useEffect(()=> {
+        console.log(elements)
+        console.log(source)
+        console.log(target)
         var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
@@ -132,7 +149,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsentence_holder('');
         },[elements,temp]);
     useEffect(()=> {
+        Reset2()
         const current = files[fileindex]
+        console.log(current)
         if(current)
         {
             setTitle(current.Event_Name)
