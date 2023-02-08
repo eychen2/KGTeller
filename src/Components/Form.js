@@ -154,7 +154,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         console.log(current)
         if(current)
         {
-            setTitle(current.Event_Name)
+            setTitle(current.Graph_Name)
             let map1 = new Map()
             const tempnodes=[];
             let tempcolor= new Map()
@@ -218,8 +218,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     return(
         <form>
             <div>
-            <input type="name" value={name} placeholder="Event Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
-            <button onClick={addTitle} className="submitButton" type="submit" > Add Event Name</button>
+            <input type="name" value={name} placeholder="Graph Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
+            <button onClick={addTitle} className="submitButton" type="submit" > Add Graph Name</button>
             </div>
             <div>
             <input type="text" value={node} placeholder="Node Name" onChange={(e)=> setnode(e.target.value)}></input>

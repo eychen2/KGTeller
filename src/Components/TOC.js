@@ -68,7 +68,7 @@ const TOC = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, senten
                         Select which graph you want to render from the file
                     </option>}
                     {Object.entries(files).map((key, value) => {
-                        return <option value={value}>{key[1].Event_Name}</option>;
+                        return <option value={value}>{key[1].Graph_Name}</option>;
                         })}
         </Form.Select>
     )

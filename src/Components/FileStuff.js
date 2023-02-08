@@ -67,7 +67,7 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
     }
     const saveCurrent = () =>{
         let temp = files
-        temp[fileindex].Event_Name=title
+        temp[fileindex].Graph_Name=title
         var tempedges=[]
         for (const x in edges)
         {

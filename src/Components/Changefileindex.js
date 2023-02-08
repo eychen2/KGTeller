@@ -21,7 +21,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
     const addNew= (e) =>{
         e.preventDefault()
         saveCurrent()
-        files.push({Event_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
+        files.push({Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
         setFiles(files)
         setfileindex(fileindex+1)
         cm.clear()
@@ -78,7 +78,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
     const saveCurrent = () =>{
         let temp = files
         console.log(temp)
-        temp[fileindex].Event_Name=title
+        temp[fileindex].Graph_Name=title
         var tempedges=[]
         //console.log(fileindex)
         for (const x in edges)

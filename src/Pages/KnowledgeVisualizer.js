@@ -42,7 +42,7 @@ import ReactFlow, {
     const [colors, setcolors] = useState([])
     const [cm, setcm] = useState(new Map())
     const [json, setjson] = useState();
-    const [files, setFiles] = useState([{Event_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
+    const [files, setFiles] = useState([{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
     return (
       <div className = "app">
@@ -62,7 +62,7 @@ import ReactFlow, {
             In order to upload preexisting knowledge graphs, they must be in a json file in the form below
           </p>
           <p>
-          {'[{'}"Event_Name": "title", "keep_triples":[["source","label","target"]...], "narration": "text", "entity_ref_dict: {'{'}{"\"<entity_0>\": \"entity\""}...{'}]'}
+          {'[{'}"Graph_Name": "title", "keep_triples":[["source","label","target"]...], "narration": "text", "entity_ref_dict: {'{'}{"\"<entity_0>\": \"entity\""}...{'}]'}
           </p> 
           <p>
           An example of this is below</p>
