@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from 'react';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
@@ -55,16 +58,21 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     };
     const addEdge = (e) =>{
         e.preventDefault();
+        console.log(source)
+        console.log(target)
+        console.log(label)
         setEdge({source: {source}, target: {target},label:{label} })
     };
     useEffect(()=> {
         console.log(elements)
         console.log(source)
         console.log(target)
+
         var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
+        console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
-            setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source, target:target, label:label, markerEnd: {
+            setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source.toLowerCase(), target:target.toLowerCase(), label:label, markerEnd: {
                 type: "arrowclosed", color: 'black'
               },style: { stroke: 'black' }}])//style:{stroke: colors[elements.length]}}])
         }
@@ -217,6 +225,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     },[files,fileindex]);
     return(
         <form>
+            <Row>
+            <Col xs={9}>
             <div>
             <input type="name" value={name} placeholder="Graph Name" onChange={(e)=> setname(e.target.value)} style={{width:300}}></input>
             <button onClick={addTitle} className="submitButton" type="submit" > Add Graph Name</button>
@@ -234,12 +244,17 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
 
             <div>
                 <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)} style={{width:500}}></input>
-            <button onClick={addText} className="submitButton" type="submit"> Add Text</button>
+            <button onClick={addText} className="submitButton" type="submit">Add Text</button>
             </div>
+            </Col>
+            <Col xs={3}>
             <div>
-            <button onClick={Reset} className="submitButton" type="submit" >Clear all</button>
+            <Button variant="danger" onClick={Reset} className="submitButton" type="submit" >Clear all</Button>
             </div>
+            </Col>
+            </Row>
         </form>
+        
     )
 }
 export default Form;

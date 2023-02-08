@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home"
+import Guide from "./Pages/Guide"
 import Visualizer from "./Pages/KnowledgeVisualizer"
 import Model from "./Pages/Model"
 import Container from 'react-bootstrap/Container';
@@ -10,11 +11,11 @@ function App() {
     <Router>
       <Navbar bg="light" variant="light">
         <Container>
-          <Navbar.Brand href="/">Graph2Text</Navbar.Brand>
+          <Navbar.Brand href="/">KGTeller</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="visualizer">Visualizer</Nav.Link>
-            <Nav.Link href="model">Model</Nav.Link>
+            <Nav.Link href="visualizer">Visualize</Nav.Link>
+            <Nav.Link href="model">Generate</Nav.Link>
+            <Nav.Link href="guide">Guide</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
@@ -22,6 +23,7 @@ function App() {
         <Route path='/' element={<Home/>} />
         <Route path='/visualizer' element={<Visualizer/>} />
         <Route path='/model' element={<Model/>} />
+        <Route path='/guide' element={<Guide/>} />
       </Routes>
     </Router>
   );

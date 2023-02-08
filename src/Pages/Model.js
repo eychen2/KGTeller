@@ -15,6 +15,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Result from '../Components/Result'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import '../App.css'
 import download from 'downloadjs';
 
 const Model = () =>{
@@ -215,8 +216,6 @@ const Model = () =>{
     }
     const handleChange = (e, index) => {
         const value = e.target.value;
-        console.log(value)
-        console.log(index)
         setPrediction((state) => [
             ...state.slice(0, index),
             value,
@@ -302,14 +301,21 @@ const Model = () =>{
         download(filestring,filename,"text/plain");
     }
     return(
-        <div className='app'>
-            <div>
-                <h1>Model</h1>
-                <p>You can use this page to upload data and see what the model outputs</p> 
+        <div className='app' style={{marginBottom:"15px", marginTop:"20px", paddingLeft: '50px', paddingRight: '50px'}}>
+            <div align='center'>
+                <h1>Generate Text from Knowledge Graphs</h1>
+                <p>Upload data and see what each model outputs</p> 
             </div>
             <div>
+               <Form>
+                    <Form.Group controlId="formFile" className="mb-3" onChange={fileRead}>
+                    <Form.Label style={{paddingLeft: '10px'}}>Input a data file</Form.Label>
+                    <Form.Control type="file" />
+                    </Form.Group>
+                </Form>
+                {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
             <Form.Group as={Col} controlId="my_multiselect_field">
-                <Form.Label>Select which models you want to use. Use Ctrl and Click to select multiple</Form.Label>
+                <Form.Label style={{paddingLeft: '10px'}}>Select which models you want to use. Use <i>Ctrl (or CMD)+Click</i> to select multiple models.</Form.Label>
                 <Form.Control as="select" multiple value={model} onChange={e => setModel([].slice.call(e.target.selectedOptions).map(item => item.value))}>
                     {models.map(model => (
                       <option key={model.value} value={model.value}>
@@ -318,14 +324,8 @@ const Model = () =>{
                     ))}
             </Form.Control>
             </Form.Group>
-                <Form>
-                    <Form.Group controlId="formFile" className="mb-3" onChange={fileRead}>
-                    <Form.Label>Input a data file</Form.Label>
-                    <Form.Control type="file" />
-                    </Form.Group>
-                </Form>
-                {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
-                <Form>
+             
+                <Form style={{padding: '5px'}}>
                     <Row>
                         <Col>
                         <Button variant="primary" type="submit" onClick={getPred}>
@@ -361,23 +361,29 @@ const Model = () =>{
                                     <ColorPara colors={colors2}>{prediction}</ColorPara>
                             </Col>*/}
                     {prediction&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
-                                maxHeight:600
-                                }}>
+                                }} >
+            
                     {prediction.map((ele, index) => {
         return (
             <div>
             <h4>
+                <b>
                 {currModel[index]}
+            
+                </b>
             </h4>
           <Result
             preds={ele}
             index={index}
+            counts={Object.keys(model).length}
             colors={colors2[index]}
             onChange={e => handleChange(e, index)}
             updateFile={updateFile}
             setPreds={setPrediction}
           />
+                
             </div>
+
         );
       })}
                     </Col>}

@@ -30,7 +30,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
     /*useEffect(()=> {
         var temp=files[fileindex]
         console.log(temp)
-        temp.Event_Name=title
+        temp.Graph_Name=title
         console.log(title)
         var tempedges=[]
         for (const x in edges)
@@ -79,6 +79,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         let temp = files
         console.log(temp)
         temp[fileindex].Graph_Name=title
+
         var tempedges=[]
         //console.log(fileindex)
         for (const x in edges)

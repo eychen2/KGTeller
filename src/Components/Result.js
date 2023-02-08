@@ -1,14 +1,15 @@
 import React, { useState } from "react";
+import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 const getColor = (colors, index) => {
     return colors[index];
   }
-const ColorPara = (props, colors) => {
+const ColorPara = (props) => {
     var i=0;
     return (
       <div style={{overflowY: 'auto',
-      maxHeight:150, width: 210}}>
+      maxHeight:210, width: 100+"%"}}>
         {props.children.split(' ').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline'}}>
@@ -19,12 +20,10 @@ const ColorPara = (props, colors) => {
       </div>
     )
   }
-export default function Result({preds, index, onChange, colors,updateFile}) {
+export default function Result({preds, index, counts, onChange, colors,updateFile}) {
   const [isEditing, setIsEditing] = useState(false);
-
   const handleClick = () => {
     setIsEditing(true);
-    console.log(preds)
   };
 
   const handleKeyPress = e => {
@@ -36,23 +35,30 @@ export default function Result({preds, index, onChange, colors,updateFile}) {
   return (
     <>
       {isEditing ? (
-        <input
-          autoFocus
-          value={preds}
-          onChange={onChange}
-          onKeyDown={handleKeyPress}
-          type="text"
-        />
-      ) : (
-        <Row >
-          <Col xs={7}>
-          <ColorPara colors={colors}>{preds}</ColorPara>
-          </Col>
-          <Col xs={2}>
-          <button onClick={handleClick}>Edit</button>
+       <Row >
+          <Col xs={9}>
+            <textarea
+              autoFocus
+              value={preds}
+              onChange={onChange}
+              onKeyDown={handleKeyPress}
+              type="text"
+              style={{height: 210, width: 100+'%'}}
+            />
           </Col>
           <Col xs={1}>
-          <button onClick={updateFile} value = {index} className="submitButton" type="submit" > Update</button>
+            <Button onClick={e => {updateFile(e); setIsEditing(false);}} variant="success" value = {index} className="submitButton" type="submit" >Update</Button>
+</Col>
+       </Row>
+      ) : (
+        <Row >
+          <Col xs={9}>
+            <ColorPara colors={colors} counts={counts}>{preds}</ColorPara>
+          </Col>
+         
+          <Col xs={1}>
+          <Button onClick={handleClick} variant="info">Edit</Button>
+          
           </Col>
           <hr class="mb-24"/>
 	</Row>

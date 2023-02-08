@@ -3,6 +3,7 @@ import ReactFlow, {
     useNodesState,
     useEdgesState,
   } from 'react-flow-renderer';
+  import ReactJson from 'react-json-view'
   import FileStuff from '../Components/FileStuff'
   import Form from '../Components/Form'
   import React, {useState} from 'react'
@@ -13,6 +14,8 @@ import ReactFlow, {
   import Row from 'react-bootstrap/Row';
   import Col from 'react-bootstrap/Col';
   import 'bootstrap/dist/css/bootstrap.min.css'
+  import '../App.css'
+  import '../assets/remixicon/remixicon.css'
   const edgeTypes = {
       smart: SmartBezierEdge
   }
@@ -45,34 +48,30 @@ import ReactFlow, {
     const [files, setFiles] = useState([{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
     return (
-      <div className = "app">
-        <div align='center'>
-            <h1>Visualizer</h1>
-        </div>
+    
+      <div className = "app" style={{marginBottom:"15px", marginTop:"20px", paddingLeft: '50px', paddingRight: '50px'}}>
         
-        <div className="appinfo">
-        <p>Welcome to the Graph2Text visualizer, a service for you to visualize or create knowledge graphs contain in a way that's easy for you to understand!</p>
-        <p>Add nodes and edges to a graph from scratch using the add node and add edge inputs, upload files and go through many graphs using the upload file features, or
-             do both by adding new nodes and edges to your already existing knowledge graphs.  (Note, that this application does not currently support multigraphs).
-          </p>
-          <p>
-            After creating or uploading graphs, you can see how they represent text by adding text using the add text feature as well as having it in your json file
-          </p>
-          <p>
-            In order to upload preexisting knowledge graphs, they must be in a json file in the form below
-          </p>
-          <p>
+        
+        <div align='left' className="appinfo">
+        <h5>Welcome to the KGTeller visualizer, a service to easily annotate knowledge graphs and text.</h5>
+          <h6>
+            In order to upload preexisting knowledge graphs, they must be in a json file in the following form below:
+          </h6>
+          <code>
           {'[{'}"Graph_Name": "title", "keep_triples":[["source","label","target"]...], "narration": "text", "entity_ref_dict: {'{'}{"\"<entity_0>\": \"entity\""}...{'}]'}
-          </p> 
-          <p>
-          An example of this is below</p>
-          <p>
-          {"[{\"Event_Name\":\"Example\",\"keep_triples\":[[\"test\",\"edge\",\"entity\"],[\"test\",\"isa\",\"example\"]],\"narration\":\"This is a <entity_0> <entity_1> to see what an <entity_2> is\",\"entity_ref_dict\":{\"<entity_0>\":\"test\",\"<entity_1>\":\"example\",\"<entity_2>\":\"entity\"}}]"}
-          </p>
-          <p>
-            If you want to save your graph, you can save it in the above form by using the save file feature and use the knowledge graph later or as an input into the model. This will be saved in the above format
-         </p>
+          </code> 
+        <br></br>
+        <br></br>
+          <h6>For example:</h6>
+          <code>
+          {"[{\"Graph_Name\":\"Example\",\"keep_triples\":[[\"test\",\"edge\",\"entity\"],[\"test\",\"is_a\",\"example\"]],\"narration\":\"This is a <entity_0> <entity_1> to see what an <entity_2> is\",\"entity_ref_dict\":{\"<entity_0>\":\"test\",\"<entity_1>\":\"example\",\"<entity_2>\":\"entity\"}}]"}
+          </code>
         </div>
+
+          <Row>
+          <FileStuff elements={nodes} edges={edges} setEdges={setEdges} sentence={sentence} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} cm={cm} title={title} colors={colors}/>
+        </Row>
+
         <div align='center'>
           {fileindex>=0&&<h2>File Table of Contents</h2>}
         {fileindex>=0&&<TOC files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
@@ -83,17 +82,15 @@ import ReactFlow, {
             <ColorPara colors={colors}>{sentence}</ColorPara>
         </div>
        <Container>
-        <Row>
-          <FileStuff elements={nodes} edges={edges} setEdges={setEdges} sentence={sentence} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} cm={cm} title={title} colors={colors}/>
-        </Row>
+      
         <Row style={{height:600}}>
           
           {files&&<Col style={{border: '2px solid rgba(0, 0, 0, 0.05)', 
                                 overflowY: 'auto',
                                 maxHeight:600
                                 }}>
-          {files&&<h3>Inputted file JSON data</h3>}
-          <p>{json}</p>
+          {files&&<h3>Input JSON file data</h3>}
+          <code>{json}</code>
           </Col>}
           <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           <ReactFlow

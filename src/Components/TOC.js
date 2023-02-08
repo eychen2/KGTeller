@@ -19,7 +19,7 @@ const TOC = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, senten
         console.log(files)
         var temp=files[fileindex]
         console.log(temp)
-        temp.Event_Name=title
+        temp.Graph_Name=title
         var tempedges=[]
         for (const x in edges)
         {
