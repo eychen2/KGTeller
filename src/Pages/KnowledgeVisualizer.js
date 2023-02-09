@@ -4,6 +4,7 @@ import ReactFlow, {
     useEdgesState,
   } from 'react-flow-renderer';
   import ReactJson from 'react-json-view'
+  import Result from '../Components/Result';
   import FileStuff from '../Components/FileStuff'
   import Form from '../Components/Form'
   import React, {useState} from 'react'
@@ -49,6 +50,11 @@ import ReactFlow, {
     const [json, setjson] = useState();
     const [files, setFiles] = useState([{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
+    const handleChange = (e) => {
+      const value = e.target.value;
+      setsentence(value
+        );
+    }
     return (
     
       <div className = "app" style={{marginBottom:"15px", marginTop:"20px", paddingLeft: '50px', paddingRight: '50px'}}>
@@ -81,7 +87,14 @@ import ReactFlow, {
         {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
-            <ColorPara colors={colors}>{sentence}</ColorPara>
+            <Result
+            preds={sentence}
+            index={0}
+            counts={1}
+            colors={colors}
+            onChange={e => handleChange(e)}
+            setPreds={setsentence}
+          />
         </div>
        <Container>
       
@@ -110,7 +123,7 @@ import ReactFlow, {
         </Row>
           <Row>
             <Col xs={10}>
-            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} setsentence={setsentence}
+            <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence}
             setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} setTitle={setTitle} cm={cm} setcm={setcm}/>
             </Col>
             <Col>
