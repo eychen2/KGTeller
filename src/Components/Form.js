@@ -44,7 +44,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     }
     const addNode = (e) => {
         e.preventDefault();
-        console.log(files)
         var index = elements.findIndex(x=>x.id===node)
         if(index===-1&&node!=='')
         {
@@ -58,11 +57,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     };
     const addEdge = (e) =>{
         e.preventDefault()
-        console.log(elements)
-        console.log(source)
-        console.log(target)
         var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
-        console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
         {
             setEdges([...edges,{id:(edges.length+1).toString(), type: 'smart', source:source.toLowerCase(), target:target.toLowerCase(), label:label, markerEnd: {
@@ -97,7 +92,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         },[edge])
     const addText = (e) =>{
         e.preventDefault();
-        var temp2 = (" "+temp+" ").toLowerCase();
         setElements(elements.sort((a, b) => {
             return a.id.length - b.id.length;
         }));
@@ -154,7 +148,6 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
     useEffect(()=> {
         Reset2()
         const current = files[fileindex]
-        console.log(current)
         if(current)
         {
             setTitle(current.Graph_Name)
@@ -174,7 +167,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 if(i%4===3)
                     y-=1;
                 tempnodes.push(node[0])
-                tempcolor.set(value,colors[tempnodes.length-1])
+                tempcolor.set(value.toLowerCase(),colors[tempnodes.length-1])
                 setcm(cm.set(colors[tempnodes.length-1],value))
                 i=i+1
             }
