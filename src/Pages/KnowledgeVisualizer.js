@@ -4,7 +4,7 @@ import ReactFlow, {
     useEdgesState,
   } from 'react-flow-renderer';
   import ReactJson from 'react-json-view'
-  import Result from '../Components/Result';
+  import TextDisplay from '../Components/TextDisplay';
   import FileStuff from '../Components/FileStuff'
   import Form from '../Components/Form'
   import React, {useState} from 'react'
@@ -54,9 +54,13 @@ import ReactFlow, {
       const value = e.target.value;
       setsentence(value
         );
+        console.log(colors)
     }
     const updateFile = (e) => {
       e.preventDefault();
+      const value = e.target.value;
+      setsentence(value
+        );
     }
     return (
     
@@ -90,15 +94,10 @@ import ReactFlow, {
         {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
-            {sentence&&<Result
-            preds={sentence}
-            index={0}
-            counts={1}
-            colors={colors}
-            onChange={e => handleChange(e)}
-            setPreds={setsentence}
-            updateFile = {updateFile}
-          />}
+            {sentence&&<TextDisplay sentence={sentence}
+             onChange={handleChange}
+             colors={colors}
+             updateFile={updateFile}/>}
         </div>
        <Container>
       

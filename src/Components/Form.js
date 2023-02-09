@@ -102,7 +102,7 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
     useEffect(()=> {
         // const pattern = /([|.,!?():;&+"'/-])/g;
         // var temp2 = temp.replace(pattern, ' $1 ').trim()
-        var temp2 = (" "+temp+" ").toLowerCase();
+        var temp2 = (" "+sentence+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
         for(const x of elements)
         {
@@ -147,6 +147,7 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
             setcolors(realcolors);
         }
         setsentence_holder('');
+        console.log(sentence)
         },[elements,sentence]);
     useEffect(()=> {
         Reset2()
