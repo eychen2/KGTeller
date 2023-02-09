@@ -57,17 +57,10 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setnode("");
     };
     const addEdge = (e) =>{
-        e.preventDefault();
-        console.log(source)
-        console.log(target)
-        console.log(label)
-        setEdge({source: {source}, target: {target},label:{label} })
-    };
-    useEffect(()=> {
+        e.preventDefault()
         console.log(elements)
         console.log(source)
         console.log(target)
-
         var index = edges.findIndex(x=>(x.source.toLowerCase()===source.toLowerCase() && x.target.toLowerCase()===target.toLowerCase()))
         console.log(index)
         if(index===-1&&target!==''&&source!==''&&label!=='')
@@ -98,7 +91,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         setsource("")
         settarget("")
         setlabel("")
-        setEdge("")
+    };
+    useEffect(()=> {
+        
         },[edge])
     const addText = (e) =>{
         e.preventDefault();
@@ -175,7 +170,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
 
             for (let [key, value] of map1) {
                 //do arrays instead of lists
-                var node = [{id: value, data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
+                var node = [{id: value.toLowerCase(), data: {label: value},position:{x:(-400+200*(i%4)),y:200*y}, style:{color: colors[tempnodes.length]}}]
                 if(i%4===3)
                     y-=1;
                 tempnodes.push(node[0])
@@ -192,8 +187,8 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
                 if(index===-1)
                 {
                     
-                    tempedges.push({id: (access).toString(), type: 'smart', source:current.keep_triples[access][0], 
-                    target:current.keep_triples[access][2], label:current.keep_triples[access][1], markerEnd: {
+                    tempedges.push({id: (access).toString(), type: 'smart', source:current.keep_triples[access][0].toLowerCase(), 
+                    target:current.keep_triples[access][2].toLowerCase(), label:current.keep_triples[access][1], markerEnd: {
                     type: "arrowclosed", color: 'black'
                   },style: { stroke: 'black' }})   
                 }
