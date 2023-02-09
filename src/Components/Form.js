@@ -100,7 +100,9 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         
     };
     useEffect(()=> {
-        var temp2 = (" "+temp+" ").toLowerCase();
+        const pattern = /([|.,!?():;&+"'/-])/g;
+        var temp2 = temp.replace(pattern, ' $1 ').trim()
+        var temp2 = (" "+temp2+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
         for(const x of elements)
         {
@@ -130,6 +132,14 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             }
         }
         var realcolors = Array(temp.split(" ").length).fill('black');
+        
+        
+        console.log("hello")
+        console.log("textcolors",textcolors)
+        console.log("temp2",temp2)
+        console.log("realcolors", realcolors)
+
+
         var index=0;
         var space=temp2.indexOf(" ",0);
         while(space>=0)

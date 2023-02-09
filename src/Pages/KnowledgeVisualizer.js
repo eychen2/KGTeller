@@ -25,9 +25,11 @@ import ReactFlow, {
   }
   const ColorPara = (props, colors) => {
     var i=0;
+    const pattern = /([|.,!?():;&+"'/-])/g;
     return (
+        
       <p>
-        {props.children.split(' ').map(text => {
+        {props.children.replace(pattern, ' $1 ').trim().split(' ').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
               {text} &nbsp;
