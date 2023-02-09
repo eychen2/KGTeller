@@ -133,10 +133,6 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         }
         var realcolors = Array(temp.split(" ").length).fill('black');
         
-        
-
-
-
         var index=0;
         var space=temp2.indexOf(" ",0);
         while(space>=0)

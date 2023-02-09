@@ -47,7 +47,7 @@ import ReactFlow, {
     const [sentence, setsentence] = useState('');
     const [colors, setcolors] = useState([])
     const [cm, setcm] = useState(new Map())
-    const [json, setjson] = useState();
+    const [json, setjson] = useState('{}');
     const [files, setFiles] = useState([{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}}]);
     const [title, setTitle] = useState("");
     const handleChange = (e) => {
@@ -104,8 +104,8 @@ import ReactFlow, {
                                 overflowY: 'auto',
                                 maxHeight:600
                                 }}>
-          {files&&<h3>Input JSON file data</h3>}
-          <code>{json}</code>
+          {files&&<h3>Input JSON</h3>}
+          <ReactJson src={JSON.parse(json)}/>
           </Col>}
           <Col style={{border: '2px solid rgba(0, 0, 0, 0.05)'}}>
           <ReactFlow
