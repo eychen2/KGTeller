@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
+const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -134,10 +134,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
         var realcolors = Array(temp.split(" ").length).fill('black');
         
         
-        console.log("hello")
-        console.log("textcolors",textcolors)
-        console.log("temp2",temp2)
-        console.log("realcolors", realcolors)
+
 
 
         var index=0;
@@ -154,7 +151,7 @@ const Form = ({elements,setElements,edges, setEdges, setsentence, setcolors, set
             setcolors(realcolors);
         }
         setsentence_holder('');
-        },[elements,temp]);
+        },[elements,sentence]);
     useEffect(()=> {
         Reset2()
         const current = files[fileindex]
