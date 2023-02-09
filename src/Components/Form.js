@@ -100,9 +100,9 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         
     };
     useEffect(()=> {
-        const pattern = /([|.,!?():;&+"'/-])/g;
-        var temp2 = temp.replace(pattern, ' $1 ').trim()
-        var temp2 = (" "+temp2+" ").toLowerCase();
+        // const pattern = /([|.,!?():;&+"'/-])/g;
+        // var temp2 = temp.replace(pattern, ' $1 ').trim()
+        var temp2 = (" "+temp+" ").toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
         for(const x of elements)
         {
