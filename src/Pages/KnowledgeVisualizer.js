@@ -55,6 +55,9 @@ import ReactFlow, {
       setsentence(value
         );
     }
+    const updateFile = (e) => {
+      e.preventDefault();
+    }
     return (
     
       <div className = "app" style={{marginBottom:"15px", marginTop:"20px", paddingLeft: '50px', paddingRight: '50px'}}>
@@ -87,14 +90,15 @@ import ReactFlow, {
         {<h1 style={{right:450}}>{title}</h1>}
         </div>
         <div align='center'>
-            <Result
+            {sentence&&<Result
             preds={sentence}
             index={0}
             counts={1}
             colors={colors}
             onChange={e => handleChange(e)}
             setPreds={setsentence}
-          />
+            updateFile = {updateFile}
+          />}
         </div>
        <Container>
       

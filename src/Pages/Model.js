@@ -96,7 +96,6 @@ const Model = () =>{
             }))
             setEdges(tempedges)
             setcolormap(tempcolor)
-            console.log(tempcolor)
         }
     },[files,fileindex]);
     useEffect(()=> {
@@ -195,7 +194,6 @@ const Model = () =>{
     }
     const modelSelect = e => {
         e.preventDefault();
-        console.log(e.target.value)
         setModel([].slice.call(e.target.selectedOptions).map(item => item.value))
     }
     const getPred = async e => {
@@ -208,7 +206,6 @@ const Model = () =>{
             model: model
         })
         .then(function (response) {
-            console.log(response)
             temp=response['data']
             setPrediction(temp);
             colorText()
@@ -275,10 +272,7 @@ const Model = () =>{
                 }
             }
         }
-        console.log(newFile[current].entity_ref_dict)
         let old_ref_dict=newFile[current].entity_ref_dict
-        console.log(mySet)
-        console.log(old_ref_dict)
         for(var key in old_ref_dict)
         {
             if(!mySet.has(old_ref_dict[key]))
@@ -291,13 +285,11 @@ const Model = () =>{
         newText=newText.slice(0,-1)
         newFile[current].narration=newText
         setFiles(newFile)
-        console.log(newText)
         setfilename("data"+model[e.target.value]+".json")
        };
     const saveFile = (e) =>{
         e.preventDefault()
         let filestring=JSON.stringify(files)
-        console.log(files[current])
         download(filestring,filename,"text/plain");
     }
     return(

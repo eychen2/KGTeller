@@ -5,8 +5,6 @@ const TOC = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, senten
     const [used,setUsed]=useState(false);
     const handleChange= (e) =>{
         e.preventDefault()
-        console.log("we called it")
-        console.log(e.target.value)
         if(e.target.value!==-1)
         {
             //saveCurrent()
@@ -16,9 +14,7 @@ const TOC = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, senten
         setUsed(true);
     };
     /*const saveCurrent = () =>{
-        console.log(files)
         var temp=files[fileindex]
-        console.log(temp)
         temp.Graph_Name=title
         var tempedges=[]
         for (const x in edges)
@@ -58,7 +54,6 @@ const TOC = ({files, setFiles, fileindex, setfileindex, cm, setcm, edges, senten
         setcmall(cmall.set(title,cm))
         filestring=filestring.slice(0,-1)
         temp.narration=filestring
-        console.log(temp)
         files[fileindex]=temp
     }*/
     return(

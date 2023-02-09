@@ -141,7 +141,6 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
         temp[fileindex].entity_ref_dict=ref_dict
         temp[fileindex].narration=newText
         setFiles(temp)
-        console.log(temp)
     }
     return(
         <div>

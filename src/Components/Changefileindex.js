@@ -77,11 +77,9 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
     },[clicked])*/
     const saveCurrent = () =>{
         let temp = files
-        console.log(temp)
         temp[fileindex].Graph_Name=title
 
         var tempedges=[]
-        //console.log(fileindex)
         for (const x in edges)
         {
             const labels =edges[x].label.split(", ")
@@ -93,7 +91,6 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         }
         temp[fileindex].keep_triples=tempedges
         const store = sentence.split(" ")
-        //console.log(store)
         var entity=0
         var index=0
         var newText=""
@@ -154,7 +151,6 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
         temp[fileindex].entity_ref_dict=ref_dict
         temp[fileindex].narration=newText
         setFiles(temp)
-        //console.log(temp)
     }
     return(
         <form>
