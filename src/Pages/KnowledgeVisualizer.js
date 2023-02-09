@@ -30,7 +30,7 @@ import ReactFlow, {
     return (
         
       <p>
-        {props.children.replace(pattern, ' $1 ').trim().split(' ').map(text => {
+        {props.children.replace(pattern, ' $1 ').split(' ').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
               {text} &nbsp;

@@ -100,39 +100,51 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         
     };
     useEffect(()=> {
-        // const pattern = /([|.,!?():;&+"'/-])/g;
-        // var temp2 = temp.replace(pattern, ' $1 ').trim()
-        var temp2 = (" "+sentence+" ").toLowerCase();
-        var textcolors= Array(temp2.length).fill('black');
-        for(const x of elements)
-        {
-            var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-        }
-        var realcolors = Array(temp.split(" ").length).fill('black');
         
+          const phraseIndices = elements.flatMap(phrase => {
+          let indices = [];
+          let index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase());
+          while (index !== -1) {
+            let id = phrase.id.toLowerCase()
+            indices.push({ id, index });
+            index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase(), index + 1);
+          }
+          return indices;
+        });
+        
+        const filteredIndices = phraseIndices.filter(index1 => {
+          for (const index2 of phraseIndices) {
+            if (index1.index == index2.index && index1.id !== index2.id && index2.id.toLowerCase().includes(index1.id.toLowerCase()))
+            {
+
+              return false;
+            }
+          }
+          return true;
+        });
+        console.log("filteredIndices", filteredIndices)
+
+
+      
+
+        
+        var temp2 = (sentence).toLowerCase();
+        var textcolors= Array(temp2.length).fill('black');
+        for(const x of filteredIndices)
+        {
+            textcolors.splice(x.index, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
+        }
+        console.log("textcolors", textcolors)
+        
+        
+        // We have the textcolors indices correct just need to apply similar regex to realcolors and ColorPara in KnowledgeVisualizer
+        const pattern = /([|.,!?():;&+"'/-])/g;
+        
+        // colors for each word
+        var realcolors = Array(sentence.replace(pattern, ' $1 ').trim().split(" ").length).fill('black');
+        
+        
+        temp2= sentence.replace(pattern, ' $1 ').trim()
         var index=0;
         var space=temp2.indexOf(" ",0);
         while(space>=0)
