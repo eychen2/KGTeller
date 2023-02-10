@@ -65,7 +65,7 @@ const Model = () =>{
                 if(i%4===3)
                     y-=1;
                 tempnodes.push(node[0])
-                tempcolor.set(value,colors[tempnodes.length-1])
+                tempcolor.set(value.toLowerCase(),colors[tempnodes.length-1])
                 setcm(cm.set(colors[tempnodes.length-1],value))
                 i=i+1
             }
@@ -99,99 +99,81 @@ const Model = () =>{
         }
     },[files,fileindex]);
     useEffect(()=> {
-    let colorstore=[]
-    for(const ele of prediction)
-    {
-    var temp2 = (" "+ele+" ").toLowerCase();
-    var textcolors= Array(temp2.length).fill('black');
-        for(const x of nodes)
+        let colorstore=[]
+        for(const ele of prediction)
         {
-            var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+            const xIndices = nodes.flatMap(x => {
+            let indices = [];
+            let index = ele.toLowerCase().indexOf(x.id.toLowerCase());
+            while (index !== -1) {
+                let id = x.id.toLowerCase()
+                indices.push({ id, index });
+                index = ele.toLowerCase().indexOf(x.id.toLowerCase(), index + 1);
             }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
-            while(indexOccurence >= 0) 
+            return indices;
+        });
+
+            const filteredIndices = xIndices.filter(index1 => {
+                for (const index2 of xIndices) {
+                    if (index1.index == index2.index && index1.id !== index2.id && index2.id.toLowerCase().includes(index1.id.toLowerCase()))
+                    {
+                        return false;
+                    }
+                }
+                  return true;
+            });
+
+            var temp2 = (ele).toLowerCase();
+            var textcolors= Array(temp2.length).fill('black');
+
+            for(const x of filteredIndices)
             {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
+                textcolors.splice(x.index, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
             }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
-            indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
-            while(indexOccurence >= 0) 
-            {
-                textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-            }
+
+            colorstore.push(textcolors)
         }
-        var realcolors = Array(ele.split(" ").length).fill('black');
-        var index=0;
-        var space=temp2.indexOf(" ",0);
-        while(space>=0)
-        {
-            realcolors[index]=textcolors[space];
-            space=temp2.indexOf(" ",space+1);
-            index++;
-        }
-        realcolors.pop();
-        colorstore.push(realcolors)
-    }
-        setcolors(colorstore)
+            setcolors(colorstore)
     },[prediction]);
+    
     const colorText = () =>{
         let colorstore=[]
         for(const ele of temp)
         {
-        var temp2 = (" "+ele+" ").toLowerCase();
-        var textcolors= Array(temp2.length).fill('black');
-            for(const x of nodes)
-            {
-                var indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+" ",0);
-                while(indexOccurence >= 0) 
-                {
-                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-                }
-                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+",",0);
-                while(indexOccurence >= 0) 
-                {
-                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-                }
-                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+".",0);
-                while(indexOccurence >= 0) 
-                {
-                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-                }
-                indexOccurence = temp2.indexOf(" "+x.id.toLowerCase()+";",0);
-                while(indexOccurence >= 0) 
-                {
-                    textcolors.splice(indexOccurence, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-                    indexOccurence=temp2.indexOf(" "+x.id.toLowerCase()+" ",indexOccurence+x.id.length);
-                }
+            const xIndices = nodes.flatMap(x => {
+            let indices = [];
+            let index = ele.toLowerCase().indexOf(x.id.toLowerCase());
+            while (index !== -1) {
+                let id = x.id.toLowerCase()
+                indices.push({ id, index });
+                index = ele.toLowerCase().indexOf(x.id.toLowerCase(), index + 1);
             }
-            var realcolors = Array(ele.split(" ").length).fill('black');
-            var index=0;
-            var space=temp2.indexOf(" ",0);
-            while(space>=0)
+            return indices;
+        });
+
+            const filteredIndices = xIndices.filter(index1 => {
+                for (const index2 of xIndices) {
+                    if (index1.index == index2.index && index1.id !== index2.id && index2.id.toLowerCase().includes(index1.id.toLowerCase()))
+                    {
+                        return false;
+                    }
+                }
+                  return true;
+            });
+
+            var temp2 = (ele).toLowerCase();
+            var textcolors= Array(temp2.length).fill('black');
+
+            for(const x of filteredIndices)
             {
-                realcolors[index]=textcolors[space];
-                space=temp2.indexOf(" ",space+1);
-                index++;
+                textcolors.splice(x.index, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
             }
-            realcolors.pop();
-            colorstore.push(realcolors)
+
+            colorstore.push(textcolors)
         }
             setcolors(colorstore)
     }
+    
     const modelSelect = e => {
         e.preventDefault();
         setModel([].slice.call(e.target.selectedOptions).map(item => item.value))
@@ -222,7 +204,7 @@ const Model = () =>{
       const updateFile = (e) =>{
         e.preventDefault()        
         let newFile=files
-        let store=prediction[e.target.value].split(" ")
+        let store=prediction[e.target.value].split("")
         var entity=0
         var index=0
         var newText=""
@@ -265,6 +247,7 @@ const Model = () =>{
                 mySet.add(cm.get(color))
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
+                
                 if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
                     newText+=store[index-1].slice(-1)
                 newText+=" "

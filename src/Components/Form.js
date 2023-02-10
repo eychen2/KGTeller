@@ -101,15 +101,15 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
     };
     useEffect(()=> {
         
-          const phraseIndices = elements.flatMap(phrase => {
-          let indices = [];
-          let index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase());
-          while (index !== -1) {
+        const phraseIndices = elements.flatMap(phrase => {
+        let indices = [];
+        let index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase());
+        while (index !== -1) {
             let id = phrase.id.toLowerCase()
             indices.push({ id, index });
             index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase(), index + 1);
-          }
-          return indices;
+        }
+        return indices;
         });
         
         const filteredIndices = phraseIndices.filter(index1 => {
@@ -122,44 +122,20 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
           }
           return true;
         });
-        console.log("filteredIndices", filteredIndices)
 
-
-      
-
-        
         var temp2 = (sentence).toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
+        
         for(const x of filteredIndices)
         {
             textcolors.splice(x.index, x.id.length,...Array(x.id.length).fill(colormap.get(x.id)));
-        }
-        console.log("textcolors", textcolors)
-        
-        
-        // We have the textcolors indices correct just need to apply similar regex to realcolors and ColorPara in KnowledgeVisualizer
-        const pattern = /([|.,!?():;&+"'/-])/g;
-        
-        // colors for each word
-        var realcolors = Array(sentence.replace(pattern, ' $1 ').trim().split(" ").length).fill('black');
-        
-        
-        temp2= sentence.replace(pattern, ' $1 ').trim()
-        var index=0;
-        var space=temp2.indexOf(" ",0);
-        while(space>=0)
-        {
-            realcolors[index]=textcolors[space];
-            space=temp2.indexOf(" ",space+1);
-            index++;
-        }
-        realcolors.pop();
+        }        
+
         if(temp2.length>2)
         {
-            setcolors(realcolors);
+            setcolors(textcolors);
         }
         setsentence_holder('');
-        console.log(sentence)
         },[elements,sentence]);
     useEffect(()=> {
         Reset2()

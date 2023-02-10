@@ -5,21 +5,23 @@ import Col from 'react-bootstrap/Col';
 const getColor = (colors, index) => {
     return colors[index];
   }
+
 const ColorPara = (props) => {
     var i=0;
     return (
       <div style={{overflowY: 'auto',
       maxHeight:210, width: 100+"%"}}>
-        {props.children.split(' ').map(text => {
+        {props.children.split('').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline'}}>
-              {text} &nbsp;
+              {text}
             </div>
           )
         })}
       </div>
     )
   }
+
 export default function Result({preds, index, counts, onChange, colors,updateFile}) {
   const [isEditing, setIsEditing] = useState(false);
   const handleClick = () => {

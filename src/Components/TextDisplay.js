@@ -10,10 +10,10 @@ const ColorPara = (props) => {
     return (
       <div style={{overflowY: 'auto',
       maxHeight:210, width: 100+"%"}}>
-        {props.children.split(' ').map(text => {
+        {props.children.split('').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline'}}>
-              {text} &nbsp;
+              {text}
             </div>
           )
         })}

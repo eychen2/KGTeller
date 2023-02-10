@@ -26,11 +26,9 @@ import ReactFlow, {
   }
   const ColorPara = (props, colors) => {
     var i=0;
-    const pattern = /([|.,!?():;&+"'/-])/g;
     return (
-        
       <p>
-        {props.children.replace(pattern, ' $1 ').split(' ').map(text => {
+        {props.children.split('').map(text => {
           return (
             <div style={{ color: getColor(props.colors, i++), display: 'inline', }}>
               {text} &nbsp;
@@ -54,7 +52,6 @@ import ReactFlow, {
       const value = e.target.value;
       setsentence(value
         );
-        console.log(colors)
     }
     const updateFile = (e) => {
       e.preventDefault();
