@@ -68,7 +68,7 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
     const saveCurrent = () =>{
         let temp = files
         temp[fileindex].Graph_Name=title
-       
+
         var tempedges=[]
         for (const x in edges)
         {
@@ -80,19 +80,20 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
 
         }
         temp[fileindex].keep_triples=tempedges
-        const store = sentence.split(" ")
+        const store = sentence
         var entity=0
         var index=0
         var newText=""
         let ref_dict={}
         const myMap = new Map()
         const mySet= new Set()
+        console.log(colors)
         while(index<colors.length)
         {
             if(colors[index]==='black')
             {
                 
-                newText+=store[index]+" "
+                newText+=store[index]
                 ++index
             }   
             else
@@ -109,12 +110,9 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
                 {
                     ++index
                 }
-                if(myMap.has(color))
+                if(myMap.has(color)&&store[0]!=='')
                 {
                     newText+=myMap.get(color)
-                    if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
-                        newText+=store[index-1].slice(-1)
-                    newText+=" "
                 }
                 else
                 {
@@ -122,9 +120,6 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
                 mySet.add(cm.get(color))
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
-                if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
-                    newText+=store[index-1].slice(-1)
-                newText+=" "
                 ++entity
                 }
             }
@@ -137,7 +132,6 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
                     ++entity
                 }
         }
-        newText=newText.slice(0,-1)
         temp[fileindex].entity_ref_dict=ref_dict
         temp[fileindex].narration=newText
         setFiles(temp)

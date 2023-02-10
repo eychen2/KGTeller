@@ -217,7 +217,7 @@ const Model = () =>{
             if(tempcolors[index]==='black')
             {
                 
-                newText+=store[index]+" "
+                newText+=store[index]
                 ++index
             }
             else
@@ -234,12 +234,9 @@ const Model = () =>{
                 {
                     ++index
                 }
-                if(myMap.has(color))
+                if(myMap.has(color)&&store[0]!=='')
                 {
                     newText+=myMap.get(color)
-                    if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
-                        newText+=store[index-1].slice(-1)
-                    newText+=" "
                 }
                 else
                 {
@@ -247,10 +244,6 @@ const Model = () =>{
                 mySet.add(cm.get(color))
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
-                
-                if('.!?,\"'.indexOf(store[index-1].slice(-1)) >= 0)
-                    newText+=store[index-1].slice(-1)
-                newText+=" "
                 ++entity
                 }
             }
@@ -265,7 +258,6 @@ const Model = () =>{
                 }
         }
         newFile[current].entity_ref_dict=ref_dict
-        newText=newText.slice(0,-1)
         newFile[current].narration=newText
         setFiles(newFile)
         setfilename("data"+model[e.target.value]+".json")
