@@ -101,6 +101,7 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
     };
     useEffect(()=> {
         
+        const nonAlphaNumeric = /\W/;
         const phraseIndices = elements.flatMap(phrase => {
         let indices = [];
         let index = sentence.toLowerCase().indexOf(phrase.id.toLowerCase());
@@ -120,9 +121,14 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
               return false;
             }
           }
-          return true;
+          const startIndex = index1.index;
+                  const endIndex = startIndex + index1.id.length;
+                  const beforePhrase = sentence[startIndex - 1];
+                  const afterPhrase = sentence[endIndex];
+                  return (nonAlphaNumeric.test(beforePhrase) || startIndex == 0) && (nonAlphaNumeric.test(afterPhrase)  || endIndex == sentence.length);
+        
         });
-
+        console.log("filteredIndices",filteredIndices)
         var temp2 = (sentence).toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
         

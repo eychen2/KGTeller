@@ -109,7 +109,7 @@ const Changefileindex = ({files, setFiles, fileindex, setfileindex, cm, setcm, e
             else
             {
                 const color = colors[index]
-                if(cm.get(color).indexOf(' ') >= 0)
+                if(cm.get(color).indexOf('') >= 0)
                 {
                     while(colors[index]===color)
                     {

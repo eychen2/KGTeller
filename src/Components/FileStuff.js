@@ -99,7 +99,7 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
             else
             {
                 const color = colors[index]
-                if(cm.get(color).indexOf(' ') >= 0)
+                if(cm.get(color).indexOf('') >= 0)
                 {
                     while(colors[index]===color)
                     {

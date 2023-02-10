@@ -100,6 +100,8 @@ const Model = () =>{
     },[files,fileindex]);
     useEffect(()=> {
         let colorstore=[]
+        const nonAlphaNumeric = /\W/;
+        
         for(const ele of prediction)
         {
             const xIndices = nodes.flatMap(x => {
@@ -120,7 +122,12 @@ const Model = () =>{
                         return false;
                     }
                 }
-                  return true;
+                
+                  const startIndex = index1.index;
+                  const endIndex = startIndex + index1.id.length;
+                  const beforePhrase = ele[startIndex - 1];
+                  const afterPhrase = ele[endIndex];
+                  return (nonAlphaNumeric.test(beforePhrase) || startIndex == 0) && (nonAlphaNumeric.test(afterPhrase)  || endIndex == ele.length);
             });
 
             var temp2 = (ele).toLowerCase();
@@ -138,6 +145,7 @@ const Model = () =>{
     
     const colorText = () =>{
         let colorstore=[]
+        const nonAlphaNumeric = /\W/;
         for(const ele of temp)
         {
             const xIndices = nodes.flatMap(x => {
@@ -158,7 +166,13 @@ const Model = () =>{
                         return false;
                     }
                 }
-                  return true;
+                
+            
+                  const startIndex = index1.index;
+                  const endIndex = startIndex + index1.id.length;
+                  const beforePhrase = ele[startIndex - 1];
+                  const afterPhrase = ele[endIndex];
+                  return (nonAlphaNumeric.test(beforePhrase) || startIndex == 0) && (nonAlphaNumeric.test(afterPhrase)  || endIndex == ele.length);
             });
 
             var temp2 = (ele).toLowerCase();
@@ -223,7 +237,7 @@ const Model = () =>{
             else
             {
                 const color = tempcolors[index]
-                if(cm.get(color).indexOf(' ') >= 0)
+                if(cm.get(color).indexOf('') >= 0)
                 {
                     while(tempcolors[index]===color)
                     {
