@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm}) =>{
+const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -25,6 +25,10 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         setcolors([]);
         setFiles("");
         setfileindex(0);
+      }
+      const createSub = (e) =>{
+        e.preventDefault()
+        console.log(selectedNodes)
       }
       const Reset2 = (e) => {
         setElements([]);
@@ -128,7 +132,6 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
                   return (nonAlphaNumeric.test(beforePhrase) || startIndex == 0) && (nonAlphaNumeric.test(afterPhrase)  || endIndex == sentence.length);
         
         });
-        console.log("filteredIndices",filteredIndices)
         var temp2 = (sentence).toLowerCase();
         var textcolors= Array(temp2.length).fill('black');
         
@@ -236,7 +239,10 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
             <Col xs={3}>
             <div>
             <Button variant="danger" onClick={Reset} className="submitButton" type="submit" >Clear all</Button>
+            <Button onClick={createSub} className="submitButton" type="submit" >Create subgraph</Button>
             </div>
+            </Col>
+            <Col>
             </Col>
             </Row>
         </form>
