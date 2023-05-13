@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes}) =>{
+const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes, title}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -28,7 +28,21 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
       }
       const createSub = (e) =>{
         e.preventDefault()
+        const newIndex=fileindex+1
+        files.splice(newIndex,0,{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
+        files[newIndex].Graph_Name=title
+        let ref_dict={}
+        let entity=0
+        for (const x in selectedNodes)
+        {
+            ref_dict["<entity_"+entity.toString()+">"]= x.id
+            ++entity
+        }
         console.log(selectedNodes)
+        console.log(files)
+        setFiles(files)
+        console.log(edges)
+        setFiles(files)
       }
       const Reset2 = (e) => {
         setElements([]);
