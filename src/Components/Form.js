@@ -30,19 +30,39 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         e.preventDefault()
         const newIndex=fileindex+1
         files.splice(newIndex,0,{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
-        files[newIndex].Graph_Name=title
+        if(title!=="")
+            files[newIndex].Graph_Name=title
+        else
+            files[newIndex].Graph_Name="subgraph"
+        let tempedges=[]
+        let set = new Set()
+        for (const x in selectedNodes)
+            set.add(selectedNodes[x].id)
+        for (const x in edges)
+        {
+            console.log(set.has(edges[x].source))
+            console.log(set.has(edges[x].target))
+            if(set.has(edges[x].source) && set.has(edges[x].target))
+            {
+                console.log(x)
+                const labels =edges[x].label.split(", ")
+                for(var i =0; i<labels.length;++i)
+                {
+                    tempedges.push([edges[x].source,labels[i],edges[x].target])
+                }
+            }
+        }
+        files[newIndex].keep_triples=tempedges
         let ref_dict={}
         let entity=0
         for (const x in selectedNodes)
-        {
-            ref_dict["<entity_"+entity.toString()+">"]= x.id
+        {    
+            ref_dict["<entity_"+entity.toString()+">"]= selectedNodes[x].id
             ++entity
         }
-        console.log(selectedNodes)
-        console.log(files)
-        setFiles(files)
-        console.log(edges)
-        setFiles(files)
+        files[newIndex].entity_ref_dict=ref_dict
+
+        setFiles(files)        
       }
       const Reset2 = (e) => {
         setElements([]);

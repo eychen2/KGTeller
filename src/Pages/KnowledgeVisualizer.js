@@ -86,7 +86,7 @@
 
           <div align='center'>
             {fileindex>=0&&<h2>File Table of Contents</h2>}
-          {fileindex>=0&&<TOC files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
+          {fileindex>=0&&<TOC elements = {nodes} files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
                                 sentence = {sentence} title={title}  colors={colors}/>}
           {<h1 style={{right:450}}>{title}</h1>}
           </div>
