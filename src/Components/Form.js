@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes, title}) =>{
+const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text_colors, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes, title}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
     const [source, setsource] = useState('');
@@ -29,13 +29,80 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
       const createSub = (e) =>{
         e.preventDefault()
         let temp = files
+        temp[fileindex].Graph_Name=title
+
+        var tempedges=[]
+        for (const x in edges)
+        {
+            const labels =edges[x].label.split(", ")
+            for(var i =0; i<labels.length;++i)
+            {
+                tempedges.push([edges[x].source,labels[i],edges[x].target])
+            }
+
+        }
+        temp[fileindex].keep_triples=tempedges
+        const store = sentence
+        var entity=0
+        var index=0
+        var newText=""
+        let ref_dict={}
+        const myMap = new Map()
+        const mySet= new Set()
+        console.log(text_colors)
+        while(index<text_colors.length)
+        {
+            if(text_colors[index]==='black')
+            {
+                
+                newText+=store[index]
+                ++index
+            }   
+            else
+            {
+                const color = text_colors[index]
+                if(cm.get(color).indexOf('') >= 0)
+                {
+                    while(text_colors[index]===color)
+                    {
+                        ++index
+                    }
+                }
+                else
+                {
+                    ++index
+                }
+                if(myMap.has(color)&&store[0]!=='')
+                {
+                    newText+=myMap.get(color)
+                }
+                else
+                {
+                myMap.set(color,"<entity_"+entity.toString()+">")
+                mySet.add(cm.get(color))
+                ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
+                newText+="<entity_"+entity.toString()+">"
+                ++entity
+                }
+            }
+        }
+        for(const x of elements)
+        {
+            if(!mySet.has(x.id))
+                {
+                    ref_dict["<entity_"+entity.toString()+">"]= x.id
+                    ++entity
+                }
+        }
+        temp[fileindex].entity_ref_dict=ref_dict
+        temp[fileindex].narration=newText
         const newIndex=fileindex+1
         temp.splice(newIndex,0,{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
         if(title!=="")
             temp[newIndex].Graph_Name=title+"_subgraph"
         else
             temp[newIndex].Graph_Name="subgraph"+newIndex
-        let tempedges=[]
+        tempedges=[]
         let set = new Set()
         for (const x in selectedNodes)
             set.add(selectedNodes[x].id)
@@ -52,8 +119,8 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
             }
         }
         temp[newIndex].keep_triples=tempedges
-        let ref_dict={}
-        let entity=0
+        ref_dict={}
+        entity=0
         for (const x in selectedNodes)
         {    
             ref_dict["<entity_"+entity.toString()+">"]= selectedNodes[x].id
