@@ -14,7 +14,7 @@ from torch import Tensor, nn
 from torch.nn import CrossEntropyLoss
 
 from transformers.activations import ACT2FN
-from transformers.configuration_bart import BartConfig
+from transformers import BartConfig
 from transformers.modeling_utils import PreTrainedModel
 from torch_scatter import scatter_mean
 

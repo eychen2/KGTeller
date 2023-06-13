@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col';
 const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text_colors, setcolors, setjson, fileindex, setfileindex, files, setFiles,setTitle, cm, setcm, selectedNodes, title}) =>{
     const [name, setname] = useState('');
     const [node, setnode] = useState('');
+    const [delnode, setdelnode] = useState('');
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
     const [label, setlabel] = useState('');
@@ -158,6 +159,21 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text
             setcm(cm.set(colors[elements.length],node))
         }
         setnode("");
+    };
+    const removeNode = (e) => {
+        e.preventDefault();
+        var index = elements.findIndex(x=>x.id===node)
+        if(!(index===-1&&node!==''))
+        {
+            // remove edges that contain the node
+            setEdges(edges.filter((item) => item.source !== node && item.target !== node));
+
+            // remove node and colors
+            setElements(elements.filter((item) => item.id !== node));
+            setcolormap(colormap.delete(node.toLowerCase()))
+            setcm(cm.delete(colors[elements.length]))
+        }
+        setdelnode("");
     };
     const addEdge = (e) =>{
         e.preventDefault()
@@ -323,6 +339,10 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text
             <div>
             <input type="text" value={node} placeholder="Node Name" onChange={(e)=> setnode(e.target.value)}></input>
             <button onClick={addNode} className="submitButton" type="submit" > Add Node</button>
+            </div>
+            <div>
+            <input type="text" value={delnode} placeholder="Node Name" onChange={(e)=> setdelnode(e.target.value)}></input>
+            <button onClick={removeNode} className="submitButton" type="submit" > Remove Node</button>
             </div>
             <div>
                 <input type="text" value={source} placeholder="Source Node Name" onChange={(e)=> setsource(e.target.value)}></input>
