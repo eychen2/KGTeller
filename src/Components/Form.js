@@ -9,6 +9,7 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
     const [source, setsource] = useState('');
     const [target, settarget] = useState('');
     const [label, setlabel] = useState('');
+    const [dellabel, setdellabel] = useState('');
     const [sentence_holder, setsentence_holder] = useState('');
     const [temp, settemp]= useState('');
     const [colormap, setcolormap] = useState(new Map())
@@ -140,6 +141,12 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
         setsource("")
         settarget("")
         setlabel("")
+    };
+    const delEdge = (e) =>{
+        e.preventDefault()
+        // delete the edge by label
+        setEdges(edges.filter((item) => item.label !== dellabel));
+        setdellabel("")
     };
     useEffect(()=> {
         
@@ -279,12 +286,15 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, setc
             <button onClick={removeNode} className="submitButton" type="submit" > Remove Node</button>
             </div>
             <div>
-                <input type="text" value={source} placeholder="Source Node Name" onChange={(e)=> setsource(e.target.value)}></input>
+            <input type="text" value={source} placeholder="Source Node Name" onChange={(e)=> setsource(e.target.value)}></input>
             <input type="text" value={target} placeholder="Target Node Name" onChange={(e)=> settarget(e.target.value)}></input>
             <input type="text" value={label} placeholder="Edge Name" onChange={(e)=> setlabel(e.target.value)}></input>
             <button onClick={addEdge} className="submitButton" type="submit" > Add Edge</button>
             </div>
-
+            <div>
+            <input type="text" value={dellabel} placeholder="Edge Name" onChange={(e)=> setdellabel(e.target.value)}></input>
+            <button onClick={delEdge} className="submitButton" type="submit" > Remove Edge</button>
+            </div>
             <div>
                 <input type="text" value={sentence_holder} placeholder="Text" onChange={(e)=> setsentence_holder(e.target.value)} style={{width:500}}></input>
             <button onClick={addText} className="submitButton" type="submit">Add Text</button>
