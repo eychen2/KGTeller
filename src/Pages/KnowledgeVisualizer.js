@@ -126,7 +126,7 @@
             <Row>
               <Col xs={10}>
               <Form elements={nodes} setElements={setNodes} edges={edges} setEdges={setEdges} sentence={sentence} setsentence={setsentence}
-              setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} setTitle={setTitle} cm={cm} setcm={setcm} selectedNodes = {selectedNodes} title={title}/>
+              text_colors={colors} setcolors={setcolors} setjson={setjson} fileindex={fileindex} setfileindex={setfileindex} files={files} setFiles={setFiles} setTitle={setTitle} cm={cm} setcm={setcm} selectedNodes = {selectedNodes} title={title}/>
               </Col>
               <Col>
               <Changefileindex files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} 
