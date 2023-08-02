@@ -68,14 +68,18 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
     const saveCurrent = () =>{
         let temp = files
         temp[fileindex].Graph_Name=title
-
+         const lowerupper= new Map()
+         for(const [key,value] of cm.entries())
+            {
+                lowerupper.set(value.toLowerCase(),value)
+            }
         var tempedges=[]
         for (const x in edges)
         {
             const labels =edges[x].label.split(", ")
             for(var i =0; i<labels.length;++i)
             {
-                tempedges.push([edges[x].source,labels[i],edges[x].target])
+                tempedges.push([lowerupper.get(edges[x].source),labels[i],lowerupper.get(edges[x].target)])
             }
 
         }
@@ -88,6 +92,8 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
         const myMap = new Map()
         const mySet= new Set()
         console.log(colors)
+        console.log(cm)
+        
         while(index<colors.length)
         {
             if(colors[index]==='black')
@@ -117,18 +123,19 @@ const FileStuff=({elements, edges, sentence, fileindex, setfileindex, files, set
                 else
                 {
                 myMap.set(color,"<entity_"+entity.toString()+">")
-                mySet.add(cm.get(color))
+                mySet.add(cm.get(color).toLowerCase())
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
                 ++entity
                 }
             }
         }
+        console.log(elements)
         for(const x of elements)
         {
             if(!mySet.has(x.id))
                 {
-                    ref_dict["<entity_"+entity.toString()+">"]= x.id
+                    ref_dict["<entity_"+entity.toString()+">"]= lowerupper.get(x.id)
                     ++entity
                 }
         }

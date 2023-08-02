@@ -32,14 +32,18 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text
         e.preventDefault()
         let temp = files
         temp[fileindex].Graph_Name=title
-
+        const lowerupper= new Map()
+         for(const [key,value] of cm.entries())
+            {
+                lowerupper.set(value.toLowerCase(),value)
+            }
         var tempedges=[]
         for (const x in edges)
         {
             const labels =edges[x].label.split(", ")
             for(var i =0; i<labels.length;++i)
             {
-                tempedges.push([edges[x].source,labels[i],edges[x].target])
+                tempedges.push([lowerupper.get(edges[x].source),labels[i],lowerupper.get(edges[x].target)])
             }
 
         }
@@ -81,7 +85,7 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text
                 else
                 {
                 myMap.set(color,"<entity_"+entity.toString()+">")
-                mySet.add(cm.get(color))
+                mySet.add(cm.get(color).toLowerCase())
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
                 ++entity
@@ -92,16 +96,17 @@ const Form = ({elements,setElements,edges, setEdges, sentence, setsentence, text
         {
             if(!mySet.has(x.id))
                 {
-                    ref_dict["<entity_"+entity.toString()+">"]= x.id
+                    ref_dict["<entity_"+entity.toString()+">"]= lowerupper.get(x.id)
                     ++entity
                 }
         }
         temp[fileindex].entity_ref_dict=ref_dict
         temp[fileindex].narration=newText
-        const newIndex=fileindex+1
+        const newIndex=Number(fileindex)+1
         temp.splice(newIndex,0,{Graph_Name:"", keep_triples:[], narration:"",entity_ref_dict:{}})
         if(title!=="")
             temp[newIndex].Graph_Name=title+"_subgraph"
+            
         else
             temp[newIndex].Graph_Name="subgraph"+newIndex
         tempedges=[]

@@ -294,7 +294,8 @@ const Model = () =>{
                     <Form.Control type="file" />
                     </Form.Group>
                 </Form>
-                {files&&<TOC files={files} fileindex={fileindex} setfileindex={setfileindex}></TOC>}
+                {files&&<TOC elements = {nodes} files={files} setFiles={setFiles} fileindex={fileindex} setfileindex={setfileindex} cm={cm} setcm ={setcm} edges={edges} title={files[fileindex].Graph_Name} sentence={files[fileindex].narration}
+                                colors={colors2}/>}
             <Form.Group as={Col} controlId="my_multiselect_field">
                 <Form.Label style={{paddingLeft: '10px'}}>Select which models you want to use. Use <i>Ctrl (or CMD)+Click</i> to select multiple models.</Form.Label>
                 <Form.Control as="select" multiple value={model} onChange={e => setModel([].slice.call(e.target.selectedOptions).map(item => item.value))}>
@@ -305,7 +306,12 @@ const Model = () =>{
                     ))}
             </Form.Control>
             </Form.Group>
-             
+            <Form>
+                <Form.Group controlId="uploadFile" className="mb-3" onChange={fileRead}>
+                <Form.Label style={{paddingLeft: '10px'}}>Upload a model file</Form.Label>
+                <Form.Control type="file" />
+                </Form.Group>
+            </Form>
                 <Form style={{padding: '5px'}}>
                     <Row>
                         <Col>

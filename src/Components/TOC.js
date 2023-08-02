@@ -9,21 +9,25 @@ const TOC = ({elements,files, setFiles, fileindex, setfileindex, cm, setcm, edge
         {
             saveCurrent()
             //setFiles(files)
-            setfileindex(e.target.value)
+            setfileindex(Number(e.target.value))
         }
         setUsed(true);
     };
     const saveCurrent = () =>{
         let temp = files
         temp[fileindex].Graph_Name=title
-
+const lowerupper= new Map()
+         for(const [key,value] of cm.entries())
+            {
+                lowerupper.set(value.toLowerCase(),value)
+            }
         var tempedges=[]
         for (const x in edges)
         {
             const labels =edges[x].label.split(", ")
             for(var i =0; i<labels.length;++i)
             {
-                tempedges.push([edges[x].source,labels[i],edges[x].target])
+                tempedges.push([lowerupper.get(edges[x].source),labels[i],lowerupper.get(edges[x].target)])
             }
 
         }
@@ -65,7 +69,7 @@ const TOC = ({elements,files, setFiles, fileindex, setfileindex, cm, setcm, edge
                 else
                 {
                 myMap.set(color,"<entity_"+entity.toString()+">")
-                mySet.add(cm.get(color))
+                mySet.add(cm.get(color).toLowerCase())
                 ref_dict["<entity_"+entity.toString()+">"]= cm.get(color)
                 newText+="<entity_"+entity.toString()+">"
                 ++entity
@@ -76,7 +80,7 @@ const TOC = ({elements,files, setFiles, fileindex, setfileindex, cm, setcm, edge
         {
             if(!mySet.has(x.id))
                 {
-                    ref_dict["<entity_"+entity.toString()+">"]= x.id
+                    ref_dict["<entity_"+entity.toString()+">"]= lowerupper.get(x.id)
                     ++entity
                 }
         }

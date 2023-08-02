@@ -1,7 +1,7 @@
 {
     "model_name": "bart",
-    "model_path": "./models/",
-    "tokenizer_path": "./models/pretrained_LM/bart-base",
+    "model_path": "/home/anthony/kg-demo/knowledge-demo/backend/models/",
+    "tokenizer_path": "/home/anthony/kg-demo/knowledge-demo/backend/models/pretrained_LM/bart-base/",
     "do_lowercase": true,
     "max_input_length": 256,
     "max_output_length": 512,

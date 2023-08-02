@@ -17,6 +17,8 @@ def BART_predict_instance(model_name, data):
     tokenizer_path = BART.params.args['tokenizer_path']
     
     #tokenizer
+    print("TOKENIZER PATH")
+    print(tokenizer_path)
     tokenizer = BartTokenizer.from_pretrained(tokenizer_path)
     
     #model
