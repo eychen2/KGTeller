@@ -31,6 +31,7 @@ const Model = () =>{
     const [colors2, setcolors] = useState([[],[],[]])
     const [cm, setcm] = useState(new Map())
     const [filename, setfilename] = useState("")
+    const [modelFile, setmodelFile] = useState(null)
     let temp=[]
     const models = jsonData.models
     const edgeTypes = {
@@ -45,6 +46,11 @@ const Model = () =>{
         filereader.onload = e => {
             setFiles(JSON.parse(e.target.result));
         }; 
+    }
+    const modelRead = e => {
+        e.preventDefault();
+        console.log(e.target.files[0]);
+        setmodelFile(e.target.files[0]);
     }
     useEffect(()=> {
         const current = files[fileindex]
@@ -194,12 +200,16 @@ const Model = () =>{
     }
     const getPred = async e => {
         e.preventDefault()
+        console.log(modelFile)
+        model.push(modelFile.name)
         setCurrent(fileindex)
         setCurrModel(model)
+        console.log(model)
         axios.post("/predict",
         {
             data:JSON.stringify(files[fileindex]),
-            model: model
+            model: model,
+            userModel: modelFile
         })
         .then(function (response) {
             temp=response['data']
